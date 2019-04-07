@@ -5,20 +5,23 @@ import torch
 import torch.nn as nn
 import pandas as pd
 import time
+import sys
+from profile import *
 class RNN(torch.nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
+    def __init__(self, params):
         super(RNN, self).__init__()
-        self.input_size = input_size
-        self.hidden_size = hidden_size
-        self.output_size = output_size
+        self.input_size = params["input_size"]
+        self.hidden_size = params["hidden_size"]
+        self.output_size = params["output_size"]
+        self.device = params["device"]
         self.rnn = nn.RNNCell(self.input_size, self.hidden_size)
         self.hidden = None
         self.linear = nn.Linear(self.hidden_size, self.output_size)
-        self.rnn.to(device)
-        self.linear.to(device)
+        self.rnn.to(self.device)
+        self.linear.to(self.device)
         #self.sm = nn.Softmax()
     def init(self, batch_size):
-        self.hidden = torch.zeros(batch_size, self.hidden_size).to(device)
+        self.hidden = torch.zeros(batch_size, self.hidden_size).to(self.device)
     def forward(self, x):
         self.hidden = self.rnn(x, self.hidden)
         #output = self.sm(self.linear(self.hidden))
@@ -26,29 +29,30 @@ class RNN(torch.nn.Module):
         return output
 
 class Task:
-    def __init__(self, load_path=None):
-        self.trpath = "../../data/tomita_dealed/T1_test1"
-        self.tepath = "../../data/tomita_dealed/T1_test1"
-        input_size = 4
-        hidden_size = 2
-        output_size = 2
-        self.model = RNN(input_size, hidden_size, output_size)
-        self.model.to(device)
+    def __init__(self, params):
+        self.trpath = params["trpath"]
+        self.tepath = params["tepath"]
+        self.input_size = params["input_size"]
+        self.hidden_size = params["hidden_size"]
+        self.output_size = params["output_size"]
+        self.device = params["device"]
+        self.model = RNN(params)
+        self.model.to(self.device)
         self.trtx, self.trty, self.tetx, self.tety = self.get_data()
         self.cel = nn.CrossEntropyLoss()
         self.optim = torch.optim.Adam(self.model.parameters())
-        self.batch_size = 5
-        self.load_path = load_path
+        self.batch_size = params["batch_size"]
+        self.load_path = params["load_path"]
         self.min_eloss = 10000
         self.state = None
-        self.epoch = 10
-        self.task = "Tomita1"
+        self.epoch = params["epoch"]
+        self.task = params["task"]
         if self.load_path:
             self.state, self.min_eloss = torch.load(self.load_path)
             self.model.load_state_dict(self.state)
-    def init(self, batch_size):
-        self.batch_size = batch_size
-        self.model.init(batch_size)
+    def init(self):
+        #self.batch_size = batch_size
+        self.model.init(self.batch_size)
     def get_data(self):
         trdata = pd.read_csv(self.trpath, header=None, index_col=None)
         trdx = trdata[0].values.tolist()
@@ -58,11 +62,11 @@ class Task:
         trdx = [list(map(lambda x: xmap[x], s)) for s in trdx]
         trdy = [list(map(lambda x: ymap[x], s)) for s in trdy]
         trtx = torch.Tensor(trdx).long()
-        trty = torch.Tensor(trdy).long().to(device)
+        trty = torch.Tensor(trdy).long().to(self.device)
         input_size = 4
         total = len(trdx)
         steps = len(trdx[0])
-        trtx = torch.zeros(total, steps, input_size).scatter_(2, trtx, 1.).to(device)
+        trtx = torch.zeros(total, steps, input_size).scatter_(2, trtx, 1.).to(self.device)
         
         tedata = pd.read_csv(self.tepath, header=None, index_col=None)
         tedx = tedata[0].values.tolist()
@@ -72,11 +76,11 @@ class Task:
         tedx = [list(map(lambda x: xmap[x], s)) for s in tedx]
         tedy = [list(map(lambda x: ymap[x], s)) for s in tedy]
         tetx = torch.Tensor(tedx).long()
-        tety = torch.Tensor(tedy).long().to(device)
+        tety = torch.Tensor(tedy).long().to(self.device)
         input_size = 4
         total = len(tedx)
         steps = len(tedx[0])
-        tetx = torch.zeros(total, steps, input_size).scatter_(2, tetx, 1.).to(device)
+        tetx = torch.zeros(total, steps, input_size).scatter_(2, tetx, 1.).to(self.device)
         
         return trtx, trty, tetx, tety
     def train(self):
@@ -124,9 +128,10 @@ class Task:
             epoch_loss += self.perbatch(xs, ys)
         print("Test Loss: %f" % ( epoch_loss / batchs))
 if __name__ == '__main__':
-    device = torch.device("cuda: 0")
+    configname = sys.argv[1]
+    config = globals()[configname]
     start = time.time()
-    t = Task()
+    t = Task(config)
     t.train()
     t.test()
     print("time: %f" % (time.time()-start))

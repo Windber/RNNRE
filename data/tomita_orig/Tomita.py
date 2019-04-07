@@ -89,7 +89,7 @@ if __name__ == "__main__":
     propab = [1/4, 1/2, 3/4]
     negmaxlen = 256
     second = True
-    iter = 10000
+    iter = 0
     g1 = Tomita(V=["A"], 
                  T=["0", "1"], 
                  S="A",
