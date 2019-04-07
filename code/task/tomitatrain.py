@@ -30,24 +30,27 @@ class RNN(torch.nn.Module):
 
 class Task:
     def __init__(self, params):
-        self.trpath = params["trpath"]
-        self.tepath = params["tepath"]
         self.input_size = params["input_size"]
         self.hidden_size = params["hidden_size"]
         self.output_size = params["output_size"]
         self.device = params["device"]
         self.model = RNN(params)
         self.model.to(self.device)
+        self.task = params["task"]
+        self.trpath = params["trpath_prefix"] + self.task + "_train"
+        self.tepath_prefix = params["tepath_prefix"] + self.task + "_test"
         self.trtx, self.trty, self.tetx, self.tety = self.get_data()
         self.cel = nn.CrossEntropyLoss()
         self.optim = torch.optim.Adam(self.model.parameters())
         self.batch_size = params["batch_size"]
-        self.load_path = params["load_path"]
+        self.load_path = params["load_path_prefix"] + self.task
         self.min_eloss = 10000
         self.state = None
         self.epoch = params["epoch"]
-        self.task = params["task"]
-        if self.load_path:
+        
+        self.save_path_prefix = params["save_path_prefix"]
+        self.load = params["load"]
+        if self.load_path and self.load:
             self.state, self.min_eloss = torch.load(self.load_path)
             self.model.load_state_dict(self.state)
     def init(self):
@@ -68,21 +71,25 @@ class Task:
         steps = len(trdx[0])
         trtx = torch.zeros(total, steps, input_size).scatter_(2, trtx, 1.).to(self.device)
         
-        tedata = pd.read_csv(self.tepath, header=None, index_col=None)
-        tedx = tedata[0].values.tolist()
-        tedy = tedata[1].values.tolist()
-        xmap = {"0": [0], "1": [1], "s": [2], "e": [3], "#": [3]}
-        ymap = {"0": 0, "1": 1}
-        tedx = [list(map(lambda x: xmap[x], s)) for s in tedx]
-        tedy = [list(map(lambda x: ymap[x], s)) for s in tedy]
-        tetx = torch.Tensor(tedx).long()
-        tety = torch.Tensor(tedy).long().to(self.device)
-        input_size = 4
-        total = len(tedx)
-        steps = len(tedx[0])
-        tetx = torch.zeros(total, steps, input_size).scatter_(2, tetx, 1.).to(self.device)
-        
-        return trtx, trty, tetx, tety
+        tetxlist = list()
+        tetylist = list()
+        for tn in range(1, 5):
+            tedata = pd.read_csv(self.tepath_prefix + str(tn), header=None, index_col=None)
+            tedx = tedata[0].values.tolist()
+            tedy = tedata[1].values.tolist()
+            xmap = {"0": [0], "1": [1], "s": [2], "e": [3], "#": [3]}
+            ymap = {"0": 0, "1": 1}
+            tedx = [list(map(lambda x: xmap[x], s)) for s in tedx]
+            tedy = [list(map(lambda x: ymap[x], s)) for s in tedy]
+            tetx = torch.Tensor(tedx).long()
+            tety = torch.Tensor(tedy).long().to(self.device)
+            input_size = 4
+            total = len(tedx)
+            steps = len(tedx[0])
+            tetx = torch.zeros(total, steps, input_size).scatter_(2, tetx, 1.).to(self.device)
+            tetxlist.append(tetx)
+            tetylist.append(tety)
+        return trtx, trty, tetxlist, tetylist
     def train(self):
         epoch = 2
         batchs = self.trtx.shape[0] // self.batch_size
@@ -100,7 +107,7 @@ class Task:
                 self.state = self.model.state_dict()
                 self.min_eloss = epoch_loss
             print("Train epoch %d Loss: %f" % (e, epoch_loss))
-        torch.save([self.state, self.min_eloss], "../../savedmodel/" + self.task + "_BestModel@" + time.strftime("%d%H%M"))
+        torch.save([self.state, self.min_eloss], self.save_path_prefix + self.task)
     def perbatch(self, xs, ys, istraining=True):
         batch_loss = 0
         steps = xs.shape[1]
@@ -116,17 +123,18 @@ class Task:
         #print("batch_loss: %f" % (batch_loss.item()))
         return batch_loss
     def test(self):
-        batchs = self.tetx.shape[0] // self.batch_size
-        steps = self.tetx.shape[1]
-        queue = torch.randperm(self.tetx.shape[0])
-        epoch_loss = 0
-        for b in range(batchs):
-            batch_start = b * self.batch_size
-            batch_end = (b + 1) * self.batch_size
-            xs = self.tetx[queue[batch_start: batch_end]]
-            ys = self.tety[batch_start: batch_end]
-            epoch_loss += self.perbatch(xs, ys)
-        print("Test Loss: %f" % ( epoch_loss / batchs))
+        for tn in range(5):
+            batchs = self.tetx[tn].shape[0] // self.batch_size
+            steps = self.tetx[tn].shape[1]
+            queue = torch.randperm(self.tetx[tn].shape[0])
+            epoch_loss = 0
+            for b in range(batchs):
+                batch_start = b * self.batch_size
+                batch_end = (b + 1) * self.batch_size
+                xs = self.tetx[tn][queue[batch_start: batch_end]]
+                ys = self.tety[tn][batch_start: batch_end]
+                epoch_loss += self.perbatch(xs, ys)
+            print("Test%d Loss: %f" % ( tn+1, epoch_loss / batchs))
 if __name__ == '__main__':
     configname = sys.argv[1]
     config = globals()[configname]
@@ -135,3 +143,4 @@ if __name__ == '__main__':
     t.train()
     t.test()
     print("time: %f" % (time.time()-start))
+    
