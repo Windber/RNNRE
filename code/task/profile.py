@@ -3,13 +3,15 @@
 '''
 import copy
 import torch
+from torch.optim import SGD, Adam, Adagrad
 BaseConfig = {"input_size": 4,
               "hidden_size": 4,
               "output_size": 2,
               "batch_size": 500,
-              "epoch": 10,
-              "lr": 0.01,
-              "device": torch.device("cuda: 0")
+              "epoch": 100,
+              "lr": 0.001,
+              "device": torch.device("cpu"),
+              "Optimizer": Adam
               }
 
 Tomita1Config = {"trpath_prefix": "../../data/tomita/",

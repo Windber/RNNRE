@@ -41,8 +41,9 @@ class Task:
         self.trpath = params["trpath_prefix"] + self.task + "_train"
         self.tepath_prefix = params["tepath_prefix"] + self.task + "_test"
         self.trtx, self.trty, self.tetx, self.tety = self.get_data()
-        self.cel = nn.CrossEntropyLoss()
-        self.optim = torch.optim.Adam(self.model.parameters(), lr=self.lr)
+        self.cel = nn.CrossEntropyLoss(reduction="sum")
+        self.optimizer = params["Optimizer"]
+        self.optim = self.optimizer(self.model.parameters(), lr=self.lr)
         self.batch_size = params["batch_size"]
         self.load_path = params["load_path_prefix"] + self.task
         self.min_eloss = 10000
@@ -96,45 +97,64 @@ class Task:
         for e in range(self.epoch):
             queue = torch.randperm(self.trtx.shape[0])
             epoch_loss = 0
+            epoch_total = 0
+            epoch_correct = 0
             for b in range(batchs):
                 batch_start = b * self.batch_size
                 batch_end = (b + 1) * self.batch_size
                 xs = self.trtx[queue[batch_start: batch_end]]
                 ys = self.trty[batch_start: batch_end]
-                epoch_loss += self.perbatch(xs, ys)
-            epoch_loss = epoch_loss / batchs
+                batch_loss, batch_total, batch_correct = self.perbatch(xs, ys)
+                epoch_loss += batch_loss
+                epoch_total += batch_total
+                epoch_correct += batch_correct
+            epoch_loss = epoch_loss / (batchs * self.batch_size)
+            epoch_accuary = epoch_correct / epoch_total
             if epoch_loss <= self.min_eloss:
                 self.state = self.model.state_dict()
                 self.min_eloss = epoch_loss
-            print("Train epoch %d Loss: %f" % (e, epoch_loss))
+            print("Train epoch %d Loss: %f Accuracy: %f" % (e, epoch_loss, epoch_accuary))
         torch.save([self.state, self.min_eloss], self.save_path_prefix + self.task)
     def perbatch(self, xs, ys, istraining=True):
         batch_loss = 0
+        total = 0
+        correct = 0
         steps = xs.shape[1]
         self.model.init(self.batch_size)
         for s in range(steps):
             x = xs[:, s, :]
             yp = self.model(x)
             batch_loss += self.cel(yp, ys[:, s])
+            _, yp_index = torch.topk(yp, 1, dim=1)
+            yp_index = yp_index.view(-1)
+            total += yp_index.shape[0]
+            correct += torch.sum( yp_index==ys[:, s] ).item()
         if istraining:
             self.optim.zero_grad()
             batch_loss.backward()
             self.optim.step()
         #print("batch_loss: %f" % (batch_loss.item()))
-        return batch_loss
+        return batch_loss, total, correct
     def test(self):
         for tn in range(4):
             batchs = self.tetx[tn].shape[0] // self.batch_size
             steps = self.tetx[tn].shape[1]
             queue = torch.randperm(self.tetx[tn].shape[0])
             epoch_loss = 0
+            epoch_total = 0
+            epoch_correct = 0
             for b in range(batchs):
                 batch_start = b * self.batch_size
                 batch_end = (b + 1) * self.batch_size
                 xs = self.tetx[tn][queue[batch_start: batch_end]]
                 ys = self.tety[tn][batch_start: batch_end]
-                epoch_loss += self.perbatch(xs, ys)
-            print("Test%d Loss: %f" % ( tn+1, epoch_loss / batchs))
+                batch_loss, batch_total, batch_correct = self.perbatch(xs, ys)
+                epoch_loss += batch_loss
+                epoch_total += batch_total
+                epoch_correct += batch_correct
+            epoch_loss = epoch_loss / (batchs * self.batch_size)
+            epoch_accuary = epoch_correct / epoch_total
+            print("Test%d Loss: %f Accuracy: %f" % ( tn+1, epoch_loss, epoch_accuary))
 if __name__ == '__main__':
     configname = sys.argv[1]
     config = globals()[configname]
