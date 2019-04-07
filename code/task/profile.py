@@ -7,14 +7,15 @@ BaseConfig = {"input_size": 4,
               "hidden_size": 4,
               "output_size": 2,
               "batch_size": 500,
-              "epoch": 1,
+              "epoch": 10,
+              "lr": 0.01,
               "device": torch.device("cuda: 0")
               }
 
 Tomita1Config = {"trpath_prefix": "../../data/tomita/",
                  "tepath_prefix": "../../data/tomita/",
                  "load_path_prefix":  "../../savedmodel/BestModel_",
-                 "load": False,
+                 "load": True,
                  "task": "T1",
                  "save_path_prefix": "../../savedmodel/BestModel_",
                  }

@@ -36,12 +36,13 @@ class Task:
         self.device = params["device"]
         self.model = RNN(params)
         self.model.to(self.device)
+        self.lr = params["lr"]
         self.task = params["task"]
         self.trpath = params["trpath_prefix"] + self.task + "_train"
         self.tepath_prefix = params["tepath_prefix"] + self.task + "_test"
         self.trtx, self.trty, self.tetx, self.tety = self.get_data()
         self.cel = nn.CrossEntropyLoss()
-        self.optim = torch.optim.Adam(self.model.parameters())
+        self.optim = torch.optim.Adam(self.model.parameters(), lr=self.lr)
         self.batch_size = params["batch_size"]
         self.load_path = params["load_path_prefix"] + self.task
         self.min_eloss = 10000
@@ -91,9 +92,8 @@ class Task:
             tetylist.append(tety)
         return trtx, trty, tetxlist, tetylist
     def train(self):
-        epoch = 2
         batchs = self.trtx.shape[0] // self.batch_size
-        for e in range(epoch):
+        for e in range(self.epoch):
             queue = torch.randperm(self.trtx.shape[0])
             epoch_loss = 0
             for b in range(batchs):
@@ -123,7 +123,7 @@ class Task:
         #print("batch_loss: %f" % (batch_loss.item()))
         return batch_loss
     def test(self):
-        for tn in range(5):
+        for tn in range(4):
             batchs = self.tetx[tn].shape[0] // self.batch_size
             steps = self.tetx[tn].shape[1]
             queue = torch.randperm(self.tetx[tn].shape[0])
