@@ -10,8 +10,8 @@ BaseConfig = {"input_size": 4,
               "batch_size": 500,
               "epoch": 100,
               "lr": 0.001,
-              "device": torch.device("cpu"),
-              "Optimizer": Adam
+              "device": torch.device("cuda: 0"),
+              "Optimizer": Adagrad
               }
 
 Tomita1Config = {"trpath_prefix": "../../data/tomita/",
