@@ -3,21 +3,21 @@
 '''
 import copy
 import torch
-from torch.optim import SGD, Adam, Adagrad
+from torch.optim import SGD, Adam, Adagrad, RMSprop
 BaseConfig = {"input_size": 4,
               "hidden_size": 4,
               "output_size": 2,
-              "batch_size": 500,
+              "batch_size": 100,
               "epoch": 100,
-              "lr": 0.001,
+              "lr": 1e-1,
               "device": torch.device("cpu"),
-              "Optimizer": Adam
+              "Optimizer": Adagrad
               }
 
 Tomita1Config = {"trpath_prefix": "../../data/tomita/",
                  "tepath_prefix": "../../data/tomita/",
                  "load_path_prefix":  "../../savedmodel/BestModel_",
-                 "load": True,
+                "load": False,
                  "task": "T1",
                  "save_path_prefix": "../../savedmodel/BestModel_",
                  }
