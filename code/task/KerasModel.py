@@ -4,17 +4,18 @@ import tensorflow.keras as keras
 import pandas as pd
 
 import numpy as np
-hidden_dim = 8
+hidden_dim = 4
+thred = 0.01
+Tomita = 1
+RNN = keras.layers.LSTM
 output_dim = 2
-Tomita = 4
-thred = 0.1
 trpath = '../../data/tomita/T' + str(Tomita) + '_train'
 tepath_prefix = '../../data/tomita/T' + str(Tomita) + '_test'
 testn = 4
 inpalpha = {'s': 2, 'e': 3, '#': 3, '0': 0, '1': 1}
 labalpha = {'0': 0, '1': 1}
 ts = [32, 64, 128, 256]
-RNN = keras.layers.SimpleRNN
+#RNN = keras.layers.LSTM
 train_df = pd.read_csv(trpath, dtype={1: str}, index_col=None, header=None)
 train_lx = train_df.iloc[:, 0].values.tolist()
 train_ly = train_df.iloc[:, 1].values.tolist()
