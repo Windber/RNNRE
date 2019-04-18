@@ -5,13 +5,15 @@ import copy
 import torch
 from torch.optim import SGD, Adam, Adagrad, RMSprop
 BaseConfig = {"input_size": 4,
-              "hidden_size": 4,
+              "hidden_size": 2,
               "output_size": 2,
               "batch_size": 100,
               "epoch": 100,
-              "lr": 1e-1,
+              "lr": 1e-3,
+              "verbose": False,
               "device": torch.device("cpu"),
-              "Optimizer": Adagrad
+              "threshold": 0.05,
+              "Optimizer": RMSprop
               }
 
 Tomita1Config = {"trpath_prefix": "../../data/tomita/",
