@@ -61,3 +61,13 @@ for timestep, tex, tel in zip(ts, tex_l, tel_l):
                  metrics=['accuracy'])
     a = emodel.evaluate(tex, tel, steps=5)
     print(a)
+
+import smtplib
+from email.mime.text import MIMEText
+text = "Tomita Task " + Tomita + " completed."
+msg = MIMEText(text, 'plain', 'utf-8')
+smtp = smtplib.SMTP()
+smtp.connect("smtp.126.com")
+smtp.login("guolipengyeah", "217000mh")
+smtp.sendmail("guolipengyeah@126.com", ["guolipengyeah@126.com"], msg.as_string())
+smtp.quit()
