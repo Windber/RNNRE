@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 import re
-class Dyck1:
+class Dyck2:
     class Grammar:
         def __init__(self, V, T, S, P):
             self.V = V
@@ -11,7 +11,7 @@ class Dyck1:
             self.S = S
             self.P = P
     def __init__(self, V, T, S, P, prob, name, diction):
-        self.Grammar = Dyck1.Grammar(V, T, S, P)
+        self.Grammar = Dyck2.Grammar(V, T, S, P)
         self.prob = prob
         self.name = name
         self.diction = diction
@@ -67,7 +67,7 @@ class Dyck1:
         output = list()
         for c in sl:
             if stack:
-                if stack[-1] == "(" and c == ")":
+                if ( stack[-1] == "[" and c == "]" ) or ( stack[-1] == "(" and c == ")" ):
                     stack.pop()
                 else:
                     stack.append(c)
@@ -80,28 +80,30 @@ class Dyck1:
                 output.append("1")
         return "".join(output), "0" if stack else "1", depth
 
-propab = [31/64, 63/128, 127/256]
+propab = [3/8, 7/16, 15/32, 31/64]
 #propab = list(map(lambda x: 1 - x, propab))
 negmaxlen = 256
-d1 = Dyck1(V=["S", "A", "B", "C"],
-            T=["(", ")"],
+second = True
+iter = 1000
+d2 = Dyck2(V=["S", "R", "B", "T"],
+            T=["(", ")", "[", "]"],
             S="S",
-            P={"S": [[], ["AS", "A"]],
-               "A": [["C"], ["B"]],
-               "B": [[], ["(S)"]],
-               "C": [["()"], []]
+            P={"S": [[], ["R", "RS"]],
+               "R": [["T"], ["B"]],
+               "B": [[], ["[S]", "(S)"]],
+               "T": [["()", "[]"], []]
                },
             prob=propab,
-            name="Dyck1",
+            name="Dyck2",
             diction={0: "(",
                     1: ")",
+                    2: "[",
+                    3: "]"
                     }
             )
   
-second = True
-iter = 10000
 if __name__ == "__main__":   
-    g = [d1]
+    g = [d2]
     for i in range(1):
         l08 = set()
         l816 = set()
