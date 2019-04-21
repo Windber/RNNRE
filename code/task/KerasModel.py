@@ -13,7 +13,7 @@ output_dim = 2
 #trpath = '../../data/tomita/T' + str(Tomita) + '_train'
 #tepath_prefix = '../../data/tomita/T' + str(Tomita) + '_test'
 # Abnbn cw
-cw = {'0': 20., '1': 80.}
+cw = {0: 0.2, 1: 0.8}
 trpath = "../../data/countlanguage/" + Task + "_train"
 tepath_prefix = "../../data/countlanguage/" + Task + "_test"
 testn = 4
@@ -31,7 +31,7 @@ trx_np = np.array(train_x)
 try_np = np.array(train_y)
 trx = tf.one_hot(trx_np, 4)
 trl = tf.one_hot(try_np, 2)
-
+tryw_np = np.vectorize(cw.get)(try_np)
 tex_l = list()
 tel_l = list()
 for i in range(testn):
@@ -52,10 +52,10 @@ model = keras.Sequential([RNN(hidden_dim, input_shape=(32, 4), return_sequences=
 
 model.compile(optimizer='rmsprop',
              loss='categorical_crossentropy',
-             metrics=['accuracy'], loss_weights=cw, sample_weight_mode="temporal")
-his = model.fit(trx, trl, steps_per_epoch=200, epochs=1)
+             metrics=['accuracy'], sample_weight_mode="temporal")
+his = model.fit(trx, trl, steps_per_epoch=200, epochs=1, sample_weight=tryw_np)
 while his.history['loss'][0] > thred:
-    his = model.fit(trx, trl, steps_per_epoch=200, epochs=1)
+    his = model.fit(trx, trl, steps_per_epoch=200, epochs=1, sample_weight=tryw_np)
 
 
 for timestep, tex, tel in zip(ts, tex_l, tel_l):
