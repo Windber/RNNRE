@@ -4,15 +4,21 @@ import tensorflow.keras as keras
 import pandas as pd
 
 import numpy as np
-hidden_dim = 4
-thred = 1
-Tomita = 1
+hidden_dim = 8
+thred = 0.01
+#Tomita = 6
+Task = "Anbn"
 RNN = keras.layers.LSTM
 output_dim = 2
-trpath = '../../data/tomita/T' + str(Tomita) + '_train'
-tepath_prefix = '../../data/tomita/T' + str(Tomita) + '_test'
+#trpath = '../../data/tomita/T' + str(Tomita) + '_train'
+#tepath_prefix = '../../data/tomita/T' + str(Tomita) + '_test'
+# Abnbn cw
+cw = {'0': 20., '1': 80.}
+trpath = "../../data/countlanguage/" + Task + "_train"
+tepath_prefix = "../../data/countlanguage/" + Task + "_test"
 testn = 4
-inpalpha = {'s': 2, 'e': 3, '#': 3, '0': 0, '1': 1}
+#inpalpha = {'s': 2, 'e': 3, '#': 3, '0': 0, '1': 1}
+inpalpha = {'s': 2, 'e': 3, '#': 3, 'a': 0, 'b': 1}
 labalpha = {'0': 0, '1': 1}
 ts = [32, 64, 128, 256]
 #RNN = keras.layers.LSTM
@@ -46,7 +52,7 @@ model = keras.Sequential([RNN(hidden_dim, input_shape=(32, 4), return_sequences=
 
 model.compile(optimizer='rmsprop',
              loss='categorical_crossentropy',
-             metrics=['accuracy'])
+             metrics=['accuracy'], loss_weights=cw, sample_weight_mode="temporal")
 his = model.fit(trx, trl, steps_per_epoch=200, epochs=1)
 while his.history['loss'][0] > thred:
     his = model.fit(trx, trl, steps_per_epoch=200, epochs=1)
@@ -64,7 +70,7 @@ for timestep, tex, tel in zip(ts, tex_l, tel_l):
     print(a)
 import smtplib
 from email.mime.text import MIMEText
-text = "Tomita Task " + Tomita + " completed."
+text = "Task " + Task + " completed."
 msg = MIMEText(text, 'plain', 'utf-8')
 smtp = smtplib.SMTP()
 smtp.connect("smtp.126.com")
