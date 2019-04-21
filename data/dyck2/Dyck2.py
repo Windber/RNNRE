@@ -80,7 +80,7 @@ class Dyck2:
                 output.append("1")
         return "".join(output), "0" if stack else "1", depth
 
-propab = [1/2, 3/8, 7/16, 15/32]
+propab = [3/8, 7/16, 15/32, 31/64]
 #propab = list(map(lambda x: 1 - x, propab))
 negmaxlen = 256
 second = True
