@@ -13,7 +13,7 @@ output_dim = 2
 #trpath = '../../data/tomita/T' + str(Tomita) + '_train'
 #tepath_prefix = '../../data/tomita/T' + str(Tomita) + '_test'
 # Abnbn cw
-cw = {0: 0.2, 1: 0.8}
+cw = {0: 0.5, 1: 0.5}
 trpath = "../../data/countlanguage/" + Task + "_train"
 tepath_prefix = "../../data/countlanguage/" + Task + "_test"
 testn = 4
