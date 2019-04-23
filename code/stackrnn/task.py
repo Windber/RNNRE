@@ -10,21 +10,18 @@ import sys
 import pandas as pd
 import random
 import time
-from stackrnncell import StackRNNCell
 from neuralcontroller import GRUController
 from neuralstack import NeuralStack
 class Task:
     def __init__(self, config_dict):
         self.params = config_dict
-        
+        self.model = self.model_name(config_dict)
+        self.trpath = self.train_path + "\\" + self.data_name + "_train"
+        self.tepath_prefix = self.test_path + "\\" + self.data_name + "_test"
         self.trainx, self.trainy, self.testxl, self.testyl = self.get_data()
-        
-        self.model = StackRNNCell(config_dict)
-        
-        self.loss_classify = nn.CrossEntropyLoss(reduction='sum')
-        self.optimizer = torch.optim.RMSprop(self.model.parameters())
         if self.load:
-            self.state, self.minloss, self.maxaccuracy = torch.load(self.load_path)
+            load_model = self.load_path + "\\" + self.load_model
+            self.state, self.minloss, self.maxaccuracy = torch.load(load_model)
             self.model.load_state_dict(self.state)
         else:
             self.state = None
@@ -49,8 +46,9 @@ class Task:
                 self.state = self.model.state_dict()
                 self.minloss = eloss.item()
                 self.maxaccuracy = eacc
+                save_model = self.saved_path + "\\" + self.task_name + "_%.2f_%.2f" % (self.minloss, self.maxaccuracy) + "@" + time.strftime("%d%H%M")
                 torch.save([self.state, self.minloss, self.maxaccuracy], 
-                           self.saved_path_prefix + time.strftime("%d%H%M") +  "_%.2f_%.2f" % (self.minloss, self.maxaccuracy))
+                           save_model)
                 
     def perepoch(self, ex, ey, e, istraining):
         samples = ex.shape[0]
@@ -75,32 +73,11 @@ class Task:
         print("Epoch %d Loss: %f Accuracy: %f" % (e, eavgloss, eaccuracy))
         return eavgloss, eaccuracy
     
-    def perbatch(self, bx, by, b, istraining):
-        bsize = self.batch_size
-        steps = bx.shape[1]
-        btotal = bsize * steps
-        yp = torch.zeros((bsize, steps, self.output_size))
-        for i in range(steps):
-            outp = self.model(bx[:, i, :])
-            yp[:, i, :] = outp
-        
-        _, yp_index = torch.topk(yp, 1, dim=2)
-        yp_index = yp_index.view(yp_index.shape[0], yp_index.shape[1])
-        bcorrect = torch.sum( yp_index == by).item()
-        yp = yp.view(-1, 2)
-        ys = by.view(-1)
-        bloss = self.loss_classify(yp, ys)
-        if istraining:
-            self.optimizer.zero_grad()
-            bloss.backward()
-            self.optimizer.step()
-        if self.verbose:
-            print("Batch %d Loss: %f Accuracy: %f" % (b, bloss / btotal, bcorrect / btotal))
-        return bloss, bcorrect, btotal
-    
-    def perstep(self):
-        pass
-    
+    def __getattr__(self, name):
+        if name in self.params:
+            return self.params[name]
+        else:
+            return super().__getattr__()
     def get_data(self):
         trdata = pd.read_csv(self.trpath, header=None, index_col=None)
         trdx = trdata[0].values.tolist()
@@ -132,8 +109,3 @@ class Task:
             tetxlist.append(tetx)
             tetylist.append(tety)
         return trtx, trty, tetxlist, tetylist
-    def __getattr__(self, name):
-        if name in self.params:
-            return self.params[name]
-        else:
-            return None
