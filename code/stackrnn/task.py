@@ -16,7 +16,10 @@ class Task:
     def __init__(self, config_dict):
         self.params = config_dict
         self.model = self.model_class(config_dict)
-        self.trpath = self.train_path + "/" + self.data_name + "_train"
+        if self.debug:
+            self.trpath = self.train_path + "/" + self.data_name + "_test1"
+        else:
+            self.trpath = self.train_path + "/" + self.data_name + "_train"
         self.tepath_prefix = self.test_path + "/" + self.data_name + "_test"
         self.trainx, self.trainy, self.testxl, self.testyl = self.get_data()
         if self.load:
@@ -40,8 +43,8 @@ class Task:
     def train(self):
         print("Train stage:")
         for e in range(self.epochs):
-            e += 1
             eloss, eacc = self.perepoch(self.trainx, self.trainy, e, True)
+            e += 1
             if eloss < self.minloss and eacc > self.maxaccuracy:
                 self.state = self.model.state_dict()
                 self.minloss = eloss.item()
@@ -65,12 +68,14 @@ class Task:
             ys = ey[queue[bstart: bend]]
             self.model.init()
             bloss, bcorrect, btotal = self.perbatch(xs, ys, b, istraining)
+            if self.verbose_batch > 0  and b // self.verbose_batch == 0:
+                print("Batch %d Loss: %f Accuracy: %f" % (b+1, bloss / btotal, bcorrect / btotal)) 
             eloss += bloss
             etotal += btotal
             ecorrect += bcorrect
         eavgloss = eloss / etotal
         eaccuracy = ecorrect / etotal
-        print("Epoch %d Loss: %f Accuracy: %f" % (e, eavgloss, eaccuracy))
+        print("Epoch %d Loss: %f Accuracy: %f" % (e+1, eavgloss, eaccuracy))
         return eavgloss, eaccuracy
     
     def __getattr__(self, name):
