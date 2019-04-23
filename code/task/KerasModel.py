@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow.keras as keras
-
+from tensorflow.keras.experimental import PeepholeLSTMCell
 import pandas as pd
 
 import numpy as np
@@ -8,7 +8,8 @@ hidden_dim = 8
 thred = 0.01
 #Tomita = 6
 Task = "Dyck1"
-RNN = keras.layers.LSTM
+cell = PeepholeLSTMCell(hidden_dim, input_shape=(32, 4))
+RNN = keras.layers.RNN
 output_dim = 2
 #trpath = '../../data/tomita/T' + str(Tomita) + '_train'
 #tepath_prefix = '../../data/tomita/T' + str(Tomita) + '_test'
@@ -47,20 +48,24 @@ for i in range(testn):
     tel = tf.one_hot(tey_np, 2)
     tex_l.append(tex)
     tel_l.append(tel)
-model = keras.Sequential([RNN(hidden_dim, input_shape=(32, 4), return_sequences=True),
+model = keras.Sequential([RNN(cell, return_sequences=True),
                          keras.layers.Dense(output_dim),
                          keras.layers.Activation('softmax')])
 
 model.compile(optimizer='rmsprop',
              loss='categorical_crossentropy',
-             metrics=['accuracy'], sample_weight_mode="temporal")
-his = model.fit(trx, trl, steps_per_epoch=200, epochs=1, sample_weight=tryw_np)
+             metrics=['accuracy'],
+             )#sample_weight_mode="temporal")
+his = model.fit(trx, trl, steps_per_epoch=200, epochs=1)
+#his = model.fit(trx, trl, steps_per_epoch=200, epochs=1, sample_weight=[tryw_np])
 while his.history['loss'][0] > thred:
-    his = model.fit(trx, trl, steps_per_epoch=200, epochs=1, sample_weight=tryw_np)
+    his = model.fit(trx, trl, steps_per_epoch=200, epochs=1)
+    #his = model.fit(trx, trl, steps_per_epoch=200, epochs=1, sample_weight=[tryw_np])
 
 
 for timestep, tex, tel in zip(ts, tex_l, tel_l):
-    emodel = keras.Sequential([RNN(hidden_dim, input_shape=(timestep, 4), return_sequences=True),
+    cell = PeepholeLSTMCell(hidden_dim, input_shape=(timestep, 4))
+    emodel = keras.Sequential([RNN(cell, return_sequences=True),
                              keras.layers.Dense(output_dim),
                              keras.layers.Activation('softmax')])
     emodel.set_weights(model.get_weights())
