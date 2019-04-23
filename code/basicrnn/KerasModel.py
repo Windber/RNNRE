@@ -4,7 +4,7 @@ from tensorflow.keras.experimental import PeepholeLSTMCell
 import pandas as pd
 
 import numpy as np
-hidden_dim = 8
+hidden_dim = 4
 thred = 0.01
 #Tomita = 6
 Task = "Dyck1"
