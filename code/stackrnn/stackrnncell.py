@@ -1,6 +1,6 @@
 import torch.nn as nn
-from neuralcontroller import GRUController
-from neuralstack import NeuralStack
+from stackrnn.neuralcontroller import GRUController
+from stackrnn.neuralstack import NeuralStack
 import torch
 class StackRNNCell(nn.Module):
 

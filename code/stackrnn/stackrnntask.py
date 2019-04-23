@@ -7,8 +7,8 @@ import sys
 import pandas as pd
 import random
 import time
-from neuralcontroller import GRUController
-from neuralstack import NeuralStack
+from stackrnn.neuralcontroller import GRUController
+from stackrnn.neuralstack import NeuralStack
 from stackrnn.task import Task
 class StackRNNTask(Task):
     def __init__(self, config_dict):

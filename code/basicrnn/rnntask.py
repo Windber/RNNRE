@@ -7,7 +7,6 @@ from torch.optim import RMSprop
 import pandas as pd
 import time
 import sys
-from task.myprofile import *
 import tensorflow as tf
 import tensorflow.keras as keras
 from stackrnn.task import Task

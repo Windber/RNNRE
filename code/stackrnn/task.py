@@ -10,17 +10,17 @@ import sys
 import pandas as pd
 import random
 import time
-from neuralcontroller import GRUController
-from neuralstack import NeuralStack
+from stackrnn.neuralcontroller import GRUController
+from stackrnn.neuralstack import NeuralStack
 class Task:
     def __init__(self, config_dict):
         self.params = config_dict
-        self.model = self.model_name(config_dict)
-        self.trpath = self.train_path + "\\" + self.data_name + "_train"
-        self.tepath_prefix = self.test_path + "\\" + self.data_name + "_test"
+        self.model = self.model_class(config_dict)
+        self.trpath = self.train_path + "/" + self.data_name + "_train"
+        self.tepath_prefix = self.test_path + "/" + self.data_name + "_test"
         self.trainx, self.trainy, self.testxl, self.testyl = self.get_data()
         if self.load:
-            load_model = self.load_path + "\\" + self.load_model
+            load_model = self.load_path + "/" + self.load_model
             self.state, self.minloss, self.maxaccuracy = torch.load(load_model)
             self.model.load_state_dict(self.state)
         else:
@@ -46,7 +46,7 @@ class Task:
                 self.state = self.model.state_dict()
                 self.minloss = eloss.item()
                 self.maxaccuracy = eacc
-                save_model = self.saved_path + "\\" + self.task_name + "_%.2f_%.2f" % (self.minloss, self.maxaccuracy) + "@" + time.strftime("%d%H%M")
+                save_model = self.saved_path + "/" + self.task_name + "_%.2f_%.2f" % (self.minloss, self.maxaccuracy) + "@" + time.strftime("%d%H%M")
                 torch.save([self.state, self.minloss, self.maxaccuracy], 
                            save_model)
                 
