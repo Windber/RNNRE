@@ -1,6 +1,6 @@
 import torch
 from stackrnn.stackrnntask import StackRNNTask
-from basicrnn.rnntask import RNNTask, RNN
+from basicrnn.rnntask import GRUTask, GRU
 from stackrnn.nlfunction import *
 from stackrnn.stackrnncell import StackRNNCell
 BasicConfig = {
@@ -16,20 +16,22 @@ BasicConfig = {
     "device": torch.device("cpu"),
     "verbose": False,
     "threshold": 0.05,
-    "load_path": r"smodel",
-    "saved_path": r"smodel",
+    "debug": True,
+    "verbose_batch": 100,
     }
-Tomita4Config = {
+t4config = {
     "task_name": "T4@GRU",
     "data_name": "T4",
     "model_name": "GRU",
-    "task_class": RNNTask,
-    "model_class": RNN,
+    "task_class": GRUTask,
+    "model_class": GRU,
     "alphabet": {"0": [0], "1": [1], "s": [2], "e": [3], "#": [3]},
     "classes": {"0": 0, "1": 1},
-    "train_path": r"../../data/tomita",
-    "test_path": r"../../data/tomita",
+    "train_path": r"../data/tomita",
+    "test_path": r"../data/tomita",
     "load_model": r"",
+    "load_path": r"basicrnn/smodel",
+    "saved_path": r"basicrnn/smodel",
     
             }
 
@@ -46,11 +48,14 @@ config_dyck2 = {
     "train_path": r"../data/dyck2",
     "test_path": r"../data/dyck2",
     "load_model": r"",
+    "load_path": r"stackrnn/smodel",
+    "saved_path": r"stackrnn/smodel",
     "sigmoid": HardSigmoid,
     
             }
 config_dyck2.update(BasicConfig)
+t4config.update(BasicConfig)
 if __name__ == "__main__":
-    config_dict = config_dyck2
+    config_dict = t4config
     task = config_dict["task_class"](config_dict)
     task.experiment()
