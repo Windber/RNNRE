@@ -13,7 +13,7 @@ from stackrnn.task import Task
 class StackRNNTask(Task):
     def __init__(self, config_dict):
         super().__init__(config_dict)
-        self.loss_classify = nn.CrossEntropyLoss(reduction='sum')
+        self.loss_classify = nn.CrossEntropyLoss(weight=torch.tensor(self.class_weight), reduction='sum')
         self.optimizer = torch.optim.RMSprop(self.model.parameters())
     def perbatch(self, bx, by, b, istraining):
         bsize = self.batch_size

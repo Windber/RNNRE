@@ -18,7 +18,7 @@ basicConfig = {
     "debug": False,
     "onlytest": False,
     "verbose_batch": 0,
-    "initialization": False,
+    "initialization": True,
     }
 tomitaConfig = {
     "alphabet": {"0": [0], "1": [1], "s": [2], "e": [3], "#": [3]},
@@ -74,6 +74,7 @@ dyck2config = {
     "load_path": r"stackrnn/smodel",
     "saved_path": r"stackrnn/smodel",
     "sigmoid": HardSigmoid,
+    "class_weight": [0.2219, 0.7781]
     
             }
 dyck2config.update(basicConfig)
