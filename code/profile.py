@@ -11,12 +11,12 @@ basicConfig = {
     "epochs": 50,
     "testfile_num": 3,
     "lr": 1e-3,
-    "load": False,
+    "load": True,
     "device": torch.device("cpu"),
     "verbose": False,
     "threshold": 0.05,
     "debug": False,
-    "onlytest": False,
+    "onlytest": True,
     "verbose_batch": 0,
     "initialization": True,
     }
@@ -67,16 +67,17 @@ dyck2config = {
     "alphabet": {"(": [0], ")": [1], "s": [2], "e": [3], "#": [3], "[": [4], "]": [5]},
     "classes": {"0": 0, "1": 1},
     "read_size": 4,
-    "n_args": 3,
+    "n_args": 2,
     "train_path": r"../data/dyck2",
     "test_path": r"../data/dyck2",
-    "load_model": r"dyck2@Stack_0.06_0.96@241645",
+    "load_model": r"dyck2@Stack_0.05_0.98@242019",
     "load_path": r"stackrnn/smodel",
     "saved_path": r"stackrnn/smodel",
     "sigmoid_type": HardSigmoid,
     "class_weight": [0.2219, 0.7781],
     "loss_num": 2,
-    "loss_weight": [0.1] 
+    "loss_weight": [0.01],
+    "linear_layers": [8],
     
             }
 dyck2config.update(basicConfig)

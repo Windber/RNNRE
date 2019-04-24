@@ -34,7 +34,9 @@ class StackRNNCell(nn.Module):
 
     def forward(self, inp):
         
-        hidden, self._v1, self._v2, (self._s1, self._s2, self._u)= self.controller(inp, self._read)
+        hidden, self._v1, self._v2, (self._s1, self._u)= self.controller(inp, self._read)
+        
+        self._s2 = self._s1.clone()
         
         self._read = self.struct(self._u, self._s1, self._s2, self._v1, self._v2)
         
