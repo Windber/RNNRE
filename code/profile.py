@@ -9,7 +9,7 @@ basicConfig = {
     "hidden_size": 8,
     "output_size": 2,
     "epochs": 50,
-    "testfile_num": 4,
+    "testfile_num": 3,
     "lr": 1e-3,
     "load": False,
     "device": torch.device("cpu"),
@@ -18,7 +18,7 @@ basicConfig = {
     "debug": False,
     "onlytest": False,
     "verbose_batch": 0,
-    "initialization": True,
+    "initialization": False,
     }
 tomitaConfig = {
     "alphabet": {"0": [0], "1": [1], "s": [2], "e": [3], "#": [3]},
@@ -58,7 +58,7 @@ t7config = {
 t4config.update(tomitaConfig)
 t5config.update(tomitaConfig)
 t7config.update(tomitaConfig)
-config_dyck2 = {
+dyck2config = {
     "task_name": "dyck2@Stack",
     "data_name": "dyck2",
     "model_name": "Stack",
@@ -76,10 +76,10 @@ config_dyck2 = {
     "sigmoid": HardSigmoid,
     
             }
-config_dyck2.update(basicConfig)
+dyck2config.update(basicConfig)
 
 if __name__ == "__main__":
-    config_dict = t7config
+    config_dict = dyck2config
     task = config_dict["task_class"](config_dict)
     task.experiment()
     

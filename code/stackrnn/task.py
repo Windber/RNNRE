@@ -92,7 +92,7 @@ class Task:
         trdx = [list(map(lambda x: xmap[x], s)) for s in trdx]
         
         trdy = [list(map(lambda x: ymap[x], s)) for s in trdy]
-        trtx = torch.Tensor(trdx).long()
+        trtx = torch.Tensor(trdx).long().to(self.device)
         trty = torch.Tensor(trdy).long().to(self.device)
         total = len(trdx)
         steps = len(trdx[0])
@@ -106,7 +106,7 @@ class Task:
             tedy = tedata[1].values.tolist()
             tedx = [list(map(lambda x: xmap[x], s)) for s in tedx]
             tedy = [list(map(lambda x: ymap[x], s)) for s in tedy]
-            tetx = torch.Tensor(tedx).long()
+            tetx = torch.Tensor(tedx).long().to(self.device)
             tety = torch.Tensor(tedy).long().to(self.device)
             total = len(tedx)
             steps = len(tedx[0])

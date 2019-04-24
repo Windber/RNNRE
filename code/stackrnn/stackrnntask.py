@@ -19,7 +19,7 @@ class StackRNNTask(Task):
         bsize = self.batch_size
         steps = bx.shape[1]
         btotal = bsize * steps
-        yp = torch.zeros((bsize, steps, self.output_size))
+        yp = torch.zeros((bsize, steps, self.output_size)).to(self.device)
         for i in range(steps):
             outp = self.model(bx[:, i, :])
             yp[:, i, :] = outp
