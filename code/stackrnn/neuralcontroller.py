@@ -23,7 +23,7 @@ class GRUController(nn.Module):
         linear_init_(self.fc_v1)
         self.fc_v2 = nn.Linear(ir_size, self.read_size).to(self.device)
         linear_init_(self.fc_v2)
-        self.sigmoid = self.sigmoid.apply
+        self.sigmoid = nn.Sigmoid()
         self.tanh = nn.Tanh()
         self.leaky_relu = nn.LeakyReLU()
     def init(self):
