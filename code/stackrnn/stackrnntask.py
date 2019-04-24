@@ -14,6 +14,7 @@ class StackRNNTask(Task):
     def __init__(self, config_dict):
         super().__init__(config_dict)
         self.loss_classify = nn.CrossEntropyLoss(weight=torch.tensor(self.class_weight), reduction='sum')
+        self.loss_stacklength = nn.MSELoss(reduction='sum')
         self.optimizer = torch.optim.RMSprop(self.model.parameters())
     def perbatch(self, bx, by, b, istraining):
         bsize = self.batch_size
@@ -30,6 +31,12 @@ class StackRNNTask(Task):
         yp = yp.view(-1, 2)
         ys = by.view(-1)
         bloss = self.loss_classify(yp, ys)
+        slen = self.model.struct._actual.view(-1)
+        stackloss = torch.zeros(1)
+        for i in range(self.batch_size):
+            if ys[i].item() == 1:
+                stackloss = stackloss + self.loss_stacklength(slen[i], torch.zeros(1).to(self.device))
+        bloss = (1-sum(self.loss_weight)) * bloss + self.loss_weight[0] * stackloss
         if istraining:
             self.optimizer.zero_grad()
             bloss.backward()
