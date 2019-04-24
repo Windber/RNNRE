@@ -9,9 +9,12 @@ class GRUController(nn.Module):
         self.hidden = None
         self.params = config_dict
         
-        controller_input_size = self.input_size + self.read_size
-        state_size = self.hidden_size + self.input_size + self.read_size
-        self.rnn = nn.GRUCell(controller_input_size, self.hidden_size).to(self.device)
+        #controller_input_size = self.input_size + self.read_size
+        qir_size = self.hidden_size + self.input_size + self.read_size
+        state_size = qir_size // 2
+        self.fc_state = nn.Linear(qir_size, state_size).to(self.device)
+        linear_init_(self.fc_state)
+        self.rnn = nn.GRUCell(state_size, self.hidden_size).to(self.device)
         gru_init_(self.rnn)
         self.fc_nargs = nn.Linear(state_size, self.n_args).to(self.device)
         linear_init_(self.fc_nargs)
@@ -30,12 +33,13 @@ class GRUController(nn.Module):
         else:
             return super().__getattr__(name)
     def forward(self, x, r):
-        last_state = torch.cat([self.hidden, x, r], dim=1)
+        qir = torch.cat([self.hidden, x, r], dim=1)
         #output = self.tanh(self.fc_o(self.hidden))
+        last_state = self.tanh(self.fc_state(qir))
         v1 = self.tanh(self.fc_v1(last_state))
         v2 = self.tanh(self.fc_v2(last_state))
         nargs = self.sigmoid(self.fc_nargs(last_state))
-        self.hidden = self.rnn(torch.cat([x, r], 1), self.hidden)
+        self.hidden = self.rnn(last_state, self.hidden)
         instructions = torch.split(nargs, list(np.ones(self.n_args, dtype=np.int32)), dim=1)
         
         return self.hidden, v1, v2, instructions
