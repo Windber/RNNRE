@@ -70,11 +70,13 @@ dyck2config = {
     "n_args": 3,
     "train_path": r"../data/dyck2",
     "test_path": r"../data/dyck2",
-    "load_model": r"dyck2@Stack_0.14_0.99@241055",
+    "load_model": r"dyck2@Stack_0.06_0.96@241645",
     "load_path": r"stackrnn/smodel",
     "saved_path": r"stackrnn/smodel",
     "sigmoid": HardSigmoid,
-    "class_weight": [0.2219, 0.7781]
+    "class_weight": [0.2219, 0.7781],
+    "loss_num": 2,
+    "loss_weight": [0.1] 
     
             }
 dyck2config.update(basicConfig)
