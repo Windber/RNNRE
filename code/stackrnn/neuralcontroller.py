@@ -1,6 +1,7 @@
 import torch.nn as nn
 import numpy as np
 import torch
+from stackrnn.initialization import gru_init_, linear_init_
 class GRUController(nn.Module):
     def __init__(self, config_dict):
         
@@ -10,15 +11,19 @@ class GRUController(nn.Module):
         
         controller_input_size = self.input_size + self.read_size
         state_size = self.hidden_size + self.input_size + self.read_size
-        self.rnn = nn.GRUCell(controller_input_size, self.hidden_size)
-        self.fc_nargs = nn.Linear(state_size, self.n_args)
-        self.fc_v1 = nn.Linear(state_size, self.read_size)
-        self.fc_v2 = nn.Linear(state_size, self.read_size)
+        self.rnn = nn.GRUCell(controller_input_size, self.hidden_size).to(self.device)
+        gru_init_(self.rnn)
+        self.fc_nargs = nn.Linear(state_size, self.n_args).to(self.device)
+        linear_init_(self.fc_nargs)
+        self.fc_v1 = nn.Linear(state_size, self.read_size).to(self.device)
+        linear_init_(self.fc_v1)
+        self.fc_v2 = nn.Linear(state_size, self.read_size).to(self.device)
+        linear_init_(self.fc_v2)
         self.sigmoid = self.sigmoid.apply
         self.tanh = nn.Tanh()
     def init(self):
         hidden_shape = (self.batch_size, self.hidden_size)
-        self.hidden = torch.zeros(hidden_shape)
+        self.hidden = torch.zeros(hidden_shape).to(self.device)
     def __getattr__(self, name):
         if name in self.params:
             return self.params[name]

@@ -1,6 +1,7 @@
 import torch.nn as nn
 from stackrnn.neuralcontroller import GRUController
 from stackrnn.neuralstack import NeuralStack
+from stackrnn.initialization import gru_init_, linear_init_
 import torch
 class StackRNNCell(nn.Module):
 
@@ -18,15 +19,17 @@ class StackRNNCell(nn.Module):
         self.controller = GRUController(config_dict)
         self.struct = NeuralStack(config_dict)
         
-        self.fc_o = nn.Linear(self.hidden_size + 1, self.output_size)
+        self.fc_o = nn.Linear(self.hidden_size + 1, self.output_size).to(self.device)
+        linear_init_(self.fc_o)
         self.tanh = nn.Tanh()
+        
 
     def init(self):
         self.struct.init()
         
         self.controller.init()
 
-        self._read = torch.zeros(self.batch_size, self.read_size)
+        self._read = torch.zeros(self.batch_size, self.read_size).to(self.device)
         
 
     def forward(self, inp):
