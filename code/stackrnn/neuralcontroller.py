@@ -24,6 +24,7 @@ class GRUController(nn.Module):
         linear_init_(self.fc_v2)
         self.sigmoid = self.sigmoid.apply
         self.tanh = nn.Tanh()
+        self.leaky_relu = nn.LeakyReLU()
     def init(self):
         hidden_shape = (self.batch_size, self.hidden_size)
         self.hidden = torch.zeros(hidden_shape).to(self.device)
@@ -35,7 +36,7 @@ class GRUController(nn.Module):
     def forward(self, x, r):
         qir = torch.cat([self.hidden, x, r], dim=1)
         #output = self.tanh(self.fc_o(self.hidden))
-        last_state = self.tanh(self.fc_state(qir))
+        last_state = self.leaky_relu(self.fc_state(qir))
         v1 = self.tanh(self.fc_v1(last_state))
         v2 = self.tanh(self.fc_v2(last_state))
         nargs = self.sigmoid(self.fc_nargs(last_state))
