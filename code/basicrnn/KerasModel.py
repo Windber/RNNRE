@@ -4,11 +4,14 @@ from tensorflow.keras.experimental import PeepholeLSTMCell
 import pandas as pd
 import tensorflow.keras.regularizers as regularizers
 import numpy as np
-hidden_dim = 4
+import tensorflow.keras.callbacks as callbacks
+import tensorflow.keras.layers as layers
+hidden_dim = 6
 thred = 0.01
 #Tomita = 6
 Task = "Dyck1"
-cell = PeepholeLSTMCell(hidden_dim, input_shape=(32, 4), kernel_regularizer=regularizers.l1(0.1))
+reg = regularizers.l1_l2(l1=0.01, l2=0.1)
+cell = PeepholeLSTMCell(hidden_dim, input_shape=(32, 4), kernel_regularizer=reg, dropout=0.3, recurrent_dropout=0.3)
 RNN = keras.layers.RNN
 output_dim = 2
 #trpath = '../../data/tomita/T' + str(Tomita) + '_train'
@@ -49,7 +52,11 @@ for i in range(testn):
     tex_l.append(tex)
     tel_l.append(tel)
 model = keras.Sequential([RNN(cell, return_sequences=True),
-                         keras.layers.Dense(output_dim, kernel_regularizer=regularizers.l1(0.1)),
+                          layers.Dropout(0.3),
+                               layers.Activation('tanh'),
+                               layers.Dense(hidden_dim, kernel_regularizer=reg),
+                               layers.Dropout(0.3),
+                         keras.layers.Dense(output_dim, kernel_regularizer=reg),
                          keras.layers.Activation('softmax')])
 
 model.compile(optimizer='rmsprop',
@@ -57,18 +64,21 @@ model.compile(optimizer='rmsprop',
              metrics=['accuracy'],
              )#sample_weight_mode="temporal")
 count = 0
-his = model.fit(trx, trl, steps_per_epoch=200, epochs=1)
-count += 1
 #his = model.fit(trx, trl, steps_per_epoch=200, epochs=1, sample_weight=[tryw_np])
-while his.history['loss'][0] > thred and count < 50:
-    his = model.fit(trx, trl, steps_per_epoch=200, epochs=1)
+while count == 0 or his.history['loss'][0] > thred and count < 50:
+    his = model.fit(trx, trl, epochs=1, validation_data=(tex_l[1], tel_l[1]), steps_per_epoch=200, validation_steps=20, callbacks=[callbacks.EarlyStopping(monitor='val_acc', patience=10)])
     #his = model.fit(trx, trl, steps_per_epoch=200, epochs=1, sample_weight=[tryw_np])
     count += 1
-
+task_name = "Anbn@LSTM"
+model.save("smodel/Keras_" + task_name + ".h5")
 for timestep, tex, tel in zip(ts, tex_l, tel_l):
     cell = PeepholeLSTMCell(hidden_dim, input_shape=(timestep, 4))
     emodel = keras.Sequential([RNN(cell, return_sequences=True),
-                             keras.layers.Dense(output_dim),
+                               layers.Dropout(0.3),
+                               layers.Activation('tanh'),
+                               layers.Dense(hidden_dim),
+                               layers.Dropout(0.3),
+                             layers.Dense(output_dim),
                              keras.layers.Activation('softmax')])
     emodel.set_weights(model.get_weights())
     emodel.compile(optimizer='rmsprop',
