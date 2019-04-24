@@ -15,10 +15,19 @@ class GRU(nn.Module):
         self.rnn = nn.GRU(input_size=self.input_size, hidden_size=self.hidden_size, num_layers=1, batch_first=True, )
         self.hidden = None
         self.linear = nn.Linear(self.hidden_size, self.output_size)
+        if self.initialization:
+            nn.init.xavier_uniform_(self.linear.weight.data)
+            nn.init.uniform_(self.linear.bias.data, 0, 0)
+            nn.init.xavier_uniform_(self.rnn.weight_ih_l0.data)
+            nn.init.orthogonal_(self.rnn.weight_hh_l0.data)
+            nn.init.uniform_(self.rnn.bias_ih_l0.data, 0, 0)
+            nn.init.uniform_(self.rnn.bias_hh_l0.data, 0, 0)
+        
         self.rnn.to(self.device)
         self.linear.to(self.device)
     def init(self):
         self.hidden = torch.zeros(1, self.batch_size, self.hidden_size).to(self.device)
+        self.hidden.to(self.device)
     def forward(self, x):
         tmp, self.hidden = self.rnn(x, self.hidden)
         output = self.linear(tmp)
