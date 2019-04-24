@@ -73,7 +73,7 @@ dyck2config = {
     "load_model": r"dyck2@Stack_0.06_0.96@241645",
     "load_path": r"stackrnn/smodel",
     "saved_path": r"stackrnn/smodel",
-    "sigmoid": HardSigmoid,
+    "sigmoid_type": HardSigmoid,
     "class_weight": [0.2219, 0.7781],
     "loss_num": 2,
     "loss_weight": [0.1] 
