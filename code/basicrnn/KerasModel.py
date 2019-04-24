@@ -7,7 +7,7 @@ import numpy as np
 hidden_dim = 4
 thred = 0.01
 #Tomita = 6
-Task = "Dyck1"
+Task = "Anbn"
 cell = PeepholeLSTMCell(hidden_dim, input_shape=(32, 4))
 RNN = keras.layers.RNN
 output_dim = 2
@@ -18,11 +18,11 @@ cw = {0: 0.5, 1: 0.5}
 trpath = "../../data/countlanguage/" + Task + "_train"
 tepath_prefix = "../../data/countlanguage/" + Task + "_test"
 testn = 4
-#inpalpha = {'s': 2, 'e': 3, '#': 3, '0': 0, '1': 1}
-inpalpha = {'s': 2, 'e': 3, '#': 3, '(': 0, ')': 1}
+inpalpha = {'s': 2, 'e': 3, '#': 3, 'a': 0, 'b': 1}
+#inpalpha = {'s': 2, 'e': 3, '#': 3, '(': 0, ')': 1}
 labalpha = {'0': 0, '1': 1}
-ts = [32, 256, 256, 512]
-#ts = [32, 64, 128, 256]
+#ts = [32, 256, 256, 512]
+ts = [32, 64, 128, 256]
 #RNN = keras.layers.LSTM
 train_df = pd.read_csv(trpath, dtype={1: str}, index_col=None, header=None)
 train_lx = train_df.iloc[:, 0].values.tolist()
