@@ -70,7 +70,7 @@ dyck2config = {
     "n_args": 2,
     "train_path": r"../data/dyck2",
     "test_path": r"../data/dyck2",
-    "load_model": r"dyck2@Stack_0.05_0.96@241924",
+    "load_model": r"dyck2@Stack_0.07_0.94@250128",
     "load_path": r"stackrnn/smodel",
     "saved_path": r"stackrnn/smodel",
     "sigmoid_type": HardSigmoid,
