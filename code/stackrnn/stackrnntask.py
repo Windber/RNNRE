@@ -24,6 +24,10 @@ class StackRNNTask(Task):
         for i in range(steps):
             outp = self.model(bx[:, i, :])
             yp[:, i, :] = outp
+            
+            for scb in self.step_callback:
+                scb.step_cb(self.model, bx[:, i, :], by[:, i], yp[:, i, :])
+                
         
         _, yp_index = torch.topk(yp, 1, dim=2)
         yp_index = yp_index.view(yp_index.shape[0], yp_index.shape[1])
@@ -43,6 +47,10 @@ class StackRNNTask(Task):
             self.optimizer.step()
         if self.verbose:
             print("Batch %d Loss: %f Accuracy: %f" % (b, bloss / btotal, bcorrect / btotal))
+            
+        for bcb in self.batch_callback:
+            bcb.batch_cb(self.model, bx, by, yp)
+            
         return bloss, bcorrect, btotal
     
     def perstep(self):

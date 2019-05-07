@@ -84,7 +84,7 @@ propab = [3/8, 7/16, 15/32, 31/64]
 #propab = list(map(lambda x: 1 - x, propab))
 negmaxlen = 256
 second = True
-iter = 1000
+iter = 1000000
 d2 = Dyck2(V=["S", "R", "B", "T"],
             T=["(", ")", "[", "]"],
             S="S",

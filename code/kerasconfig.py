@@ -1,0 +1,36 @@
+from basicrnn.KerasModel import Task
+Anbnconfig = {"hidden_size": 4,
+          "output_size": 2,
+          "task_name": "Anbn",
+          "cell_name": "LSTM",
+          "train_path":  "../data/countlanguage/",
+          "test_path": "../data/countlanguage/",
+          "test_num": 4,
+          "alphabet": {'s': 2, 'e': 3, '#': 3, 'a': 0, 'b': 1},
+          "classes": {'0': 0, '1': 1},
+          "class_weight": {0: 0.2, 1: 0.8},
+          "loss_thred": 0.01,
+          "test_timestep": [32, 64, 128, 256],
+          }
+Dyck1config = {"hidden_size": 4,
+          "output_size": 2,
+          "task_name": "Dyck1",
+          "cell_name": "LSTM",
+          "train_path":  "../data/countlanguage/",
+          "test_path": "../data/countlanguage/",
+          "save_path": "basicrnn/smodel/Keras_",
+          "load_path": "basicrnn/smodel/Keras_Dyck1@LSTM.h5",
+          "test_num": 4,
+          "alphabet": {'s': 2, 'e': 3, '#': 3, '(': 0, ')': 1},
+          "classes": {'0': 0, '1': 1},
+          "class_weight": {0: 0.2, 1: 0.8},
+          "loss_thred": 0.01,
+          "test_timestep": [32, 256, 256, 512],
+          "valid_test": 3,
+          "onlytest": False,
+          "debug": False,
+          "epochs": 50,
+          } 
+if __name__=="__main__":
+    config_dict = Dyck1config
+    Task(config_dict).experiment()
