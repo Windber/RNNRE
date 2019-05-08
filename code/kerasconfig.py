@@ -14,7 +14,7 @@ Anbnconfig = {"hidden_size": 4,
           }
 Dyck1config = {"hidden_size": 4,
           "output_size": 2,
-          "task_name": "Dyck1",
+          "task_name": "dyck1",
           "cell_name": "LSTM",
           "train_path":  "../data/countlanguage/",
           "test_path": "../data/countlanguage/",

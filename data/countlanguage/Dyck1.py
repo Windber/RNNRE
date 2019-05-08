@@ -92,7 +92,7 @@ d1 = Dyck1(V=["S", "A", "B", "C"],
                "C": [["()"], []]
                },
             prob=propab,
-            name="Dyck1",
+            name="dyck1",
             diction={0: "(",
                     1: ")",
                     }

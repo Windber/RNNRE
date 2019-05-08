@@ -24,12 +24,13 @@ class Task:
         self.trainx, self.trainy, self.testxl, self.testyl = self.get_data()
         if self.load:
             load_model = self.load_path + "/" + self.load_model
-            self.state, self.minloss, self.maxaccuracy = torch.load(load_model)
+            self.state, self.minloss, self.maxaccuracy, self.maxtestaccuracy = torch.load(load_model)
             self.model.load_state_dict(self.state)
         else:
             self.state = None
             self.minloss = 1e3
             self.maxaccuracy = 0.
+            self.maxtestaccuracy = 0.
     def experiment(self):
         if not self.onlytest:
             self.train()
@@ -37,20 +38,30 @@ class Task:
         
     def test(self):
         print("Test stage:")
+        loss = 0
+        acc = 0
         for testx, testy in zip(self.testxl, self.testyl):
-            eloss, eacc = self.perepoch(testx, testy, 1, False)
-            
+            eloss, eacc = self.perepoch(testx, testy, -1, False)
+            loss += eloss
+            acc += eacc
+        testnum = len(self.testxl)
+        loss = loss / testnum
+        acc = acc / testnum
+        print("Test Avg Loss: %f Avg Accuracy: %f" % (loss, acc))
+        return loss, acc 
     def train(self):
         print("Train stage:")
         for e in range(self.epochs):
             eloss, eacc = self.perepoch(self.trainx, self.trainy, e, True)
             e += 1
-            if eloss < self.minloss and eacc > self.maxaccuracy:
+            testloss, testeacc = self.test()
+            if eloss <= self.minloss and eacc >= self.maxaccuracy and testeacc >= self.maxtestaccuracy:
                 self.state = self.model.state_dict()
-                self.minloss = eloss.item()
+                self.minloss = eloss
                 self.maxaccuracy = eacc
-                save_model = self.saved_path + "/" + self.task_name + "_%.2f_%.2f" % (self.minloss, self.maxaccuracy) + "@" + time.strftime("%d%H%M")
-                torch.save([self.state, self.minloss, self.maxaccuracy], 
+                self.maxtestaccuracy = testeacc
+                save_model = self.saved_path + "/" + self.task_name + "_%.2f_%.2f" % (self.maxaccuracy, self.maxtestaccuracy) + "@" + time.strftime("%H%M")
+                torch.save([self.state, self.minloss, self.maxaccuracy, self.maxtestaccuracy], 
                            save_model)
                 
     def perepoch(self, ex, ey, e, istraining):
@@ -91,9 +102,9 @@ class Task:
         ymap = self.classes
         trdx = [list(map(lambda x: xmap[x], s)) for s in trdx]
         
-        trdy = [list(map(lambda x: ymap[x], s)) for s in trdy]
+        trdy = [list(map(lambda x: ymap[x], s.split('0x')[1:])) for s in trdy]
         trtx = torch.Tensor(trdx).long().to(self.device)
-        trty = torch.Tensor(trdy).long().to(self.device)
+        trty = torch.Tensor(trdy).float().to(self.device)
         total = len(trdx)
         steps = len(trdx[0])
         trtx = torch.zeros(total, steps, self.input_size).scatter_(2, trtx, 1.).to(self.device)
@@ -105,9 +116,9 @@ class Task:
             tedx = tedata[0].values.tolist()
             tedy = tedata[1].values.tolist()
             tedx = [list(map(lambda x: xmap[x], s)) for s in tedx]
-            tedy = [list(map(lambda x: ymap[x], s)) for s in tedy]
+            tedy = [list(map(lambda x: ymap[x], s.split('0x')[1:])) for s in tedy]
             tetx = torch.Tensor(tedx).long().to(self.device)
-            tety = torch.Tensor(tedy).long().to(self.device)
+            tety = torch.Tensor(tedy).float().to(self.device)
             total = len(tedx)
             steps = len(tedx[0])
             tetx = torch.zeros(total, steps, self.input_size).scatter_(2, tetx, 1.).to(self.device)
