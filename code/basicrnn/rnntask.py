@@ -37,7 +37,11 @@ class RNN(nn.Module):
         outputs = list()
         for i in range(timestep):
             self.hidden = self.cell(x[:, i, :], self.hidden)
-            output = self.nonlinear(self.linear(self.hidden[0]))
+            if self.model_name == 'LSTM':
+                tmp = self.hidden[0]
+            else:
+                tmp = self.hidden
+            output = self.nonlinear(self.linear(tmp))
             outputs.append(torch.unsqueeze(output, 1))
         outputs = torch.cat(outputs, 1)
         return outputs

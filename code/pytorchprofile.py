@@ -14,7 +14,7 @@ basicConfig = {
     "device": torch.device("cpu"),
     "verbose": False,
     "threshold": 0.05,
-    "debug": True,
+    "debug": False,
     "onlytest": False,
     "verbose_batch": 0,
     "initialization": True,
@@ -68,16 +68,37 @@ anbnconfig = {
     "test_path": r"../data_predicttask/countlanguage",
     "load_path": r"basicrnn/smodel",
     "saved_path": r"basicrnn/smodel",
+   "task_class": RNNTask,
+    "model_class": RNN,
+    }
+anbnconfig.update(basicConfig)
+
+anbnGRUconfig = {
+    "task_name": "anbn@GRU",
+    "data_name": "anbn",
+    "model_name": "GRU",
+    "cell_class": nn.GRUCell,
+     "load_model": r"anbn@LSTM_1.00_0.80@1118",
+    }
+
+anbnGRUconfig = {
+    "task_name": "anbn@GRU",
+    "data_name": "anbn",
+    "model_name": "GRU",
+    "cell_class": nn.GRUCell,
+     "load_model": r"anbn@GRU_1.00_0.80@1118",
+    }
+
+anbnLSTMconfig = {
     "task_name": "anbn@LSTM",
     "data_name": "anbn",
     "model_name": "LSTM",
     "cell_class": nn.LSTMCell,
-    "task_class": RNNTask,
-    "model_class": RNN,
-    "load_model": r"anbn@LSTM_1.00_0.80@1118",
+     "load_model": r"anbn@LSTM_1.00_0.80@1118",
     }
-anbnconfig.update(basicConfig)
 
+anbnGRUconfig.update(anbnconfig)
+anbnLSTMconfig.update(anbnconfig)
 anbncnconfig = {
     "input_size": 5,
     "hidden_size": 4,
@@ -145,7 +166,7 @@ dyck2config = {
 dyck2config.update(basicConfig)
 
 if __name__ == "__main__":
-    config_dict = dyck1config
+    config_dict = anbnGRUconfig
     task = config_dict["task_class"](config_dict)
     task.experiment()
     
