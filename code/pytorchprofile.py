@@ -9,7 +9,7 @@ basicConfig = {
     "batch_size": 10,
     "epochs": 10,
     "testfile_num": 5,
-    "lr": 1e-4,
+    "lr": 1e-3,
     "load": True,
     "device": torch.device("cpu"),
     "verbose": False,
@@ -74,7 +74,7 @@ anbnconfig = {
     "cellclass": nn.LSTMCell,
     "task_class": RNNTask,
     "model_class": RNN,
-    "load_model": r"anbn@LSTM_0.00_0.00@2055",
+    "load_model": r"anbn@LSTM_1.00_0.80@1118",
     }
 anbnconfig.update(basicConfig)
 
@@ -94,7 +94,7 @@ anbncnconfig = {
     "cell": nn.GRU,
     "task_class": RNNTask,
     "model_class": RNN,
-    "load_model": r"anbncn@LSTM_1.00_0.88@1822",
+    "load_model": r"anbn@LSTM_1.00_0.80@1118",
     }
 anbncnconfig.update(basicConfig)
 sd = Save_data(file_name="stackrnn/sdata/hotmap")

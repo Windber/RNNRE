@@ -38,8 +38,8 @@ class RNN(nn.Module):
         for i in range(timestep):
             self.hidden = self.cell(x[:, i, :], self.hidden)
             output = self.nonlinear(self.linear(self.hidden[0]))
-            outputs.append(output)
-        outputs = torch.cat(outputs).view(self.batch_size, timestep, self.output_size)
+            outputs.append(torch.unsqueeze(output, 1))
+        outputs = torch.cat(outputs, 1)
         return outputs
     def __getattr__(self, name):
         if name in self.params:
