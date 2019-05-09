@@ -1,11 +1,11 @@
 import torch
 import torch.nn as nn
-from stackrnn.stackrnntask import StackRNNTask
+from stackrnn.stackrnntask import StackRNNTask, StackRNN
 from basicrnn.rnntask import RNNTask, RNN
 from stackrnn.nlfunction import *
 from stackrnn.stackrnncell import StackRNNCell
 from stackrnn.callback import Save_data
-basicConfig = {
+basic = {
     "batch_size": 10,
     "epochs": 10,
     "testfile_num": 2,
@@ -13,11 +13,30 @@ basicConfig = {
     "load": False,
     "device": torch.device("cpu"),
     "verbose": False,
-    "threshold": 0.05,
-    "debug": False,
+    "debug": True,
     "onlytest": False,
     "verbose_batch": 0,
     "initialization": True,
+    }
+anbn = {
+    "alphabet": {"a": [2], "b": [3], "s": [0], "e": [1], "#": [1]},
+    "classes": {"3": [1, 1, 0], "6": [0, 1, 1], "4": [0, 0, 1], "1": [1, 0, 0]},
+    "input_size": 4,
+    "hidden_size": 3,
+    "output_size": 3,
+    "train_path": r"../data_predicttask/countlanguage",
+    "test_path": r"../data_predicttask/countlanguage",
+    "data_name": "anbn",
+
+    }
+
+gru = {
+    "model_name": "GRU",
+    "cell_class": nn.GRUCell,
+    "load_path": r"basicrnn/smodel",
+    "saved_path": r"basicrnn/smodel",
+   "task_class": RNNTask,
+    "model_class": RNN,
     }
 tomitaConfig = {
     "alphabet": {"0": [0], "1": [1], "s": [2], "e": [3], "#": [3]},
@@ -27,7 +46,7 @@ tomitaConfig = {
     "load_path": r"basicrnn/smodel",
     "saved_path": r"basicrnn/smodel",
     }
-tomitaConfig.update(basicConfig)
+tomitaConfig.update(basic)
 t4config = {
     "task_name": "T4@GRU",
     "data_name": "T4",
@@ -58,36 +77,11 @@ t4config.update(tomitaConfig)
 t5config.update(tomitaConfig)
 t7config.update(tomitaConfig)
 
-anbnconfig = {
-    "input_size": 4,
-    "hidden_size": 3,
-    "output_size": 3,
-    "alphabet": {"a": [2], "b": [3], "s": [0], "e": [1], "#": [1]},
-    "classes": {"3": [1, 1, 0], "6": [0, 1, 1], "4": [0, 0, 1], "1": [1, 0, 0]},
-    "train_path": r"../data_predicttask/countlanguage",
-    "test_path": r"../data_predicttask/countlanguage",
-    "load_path": r"basicrnn/smodel",
-    "saved_path": r"basicrnn/smodel",
-   "task_class": RNNTask,
-    "model_class": RNN,
-    }
-anbnconfig.update(basicConfig)
-
-anbnGRUconfig = {
+anbngruConfig = {
     "task_name": "anbn@GRU",
-    "data_name": "anbn",
-    "model_name": "GRU",
-    "cell_class": nn.GRUCell,
      "load_model": r"anbn@LSTM_1.00_0.80@1118",
     }
 
-anbnGRUconfig = {
-    "task_name": "anbn@GRU",
-    "data_name": "anbn",
-    "model_name": "GRU",
-    "cell_class": nn.GRUCell,
-     "load_model": r"anbn@GRU_1.00_0.80@1118",
-    }
 
 anbnLSTMconfig = {
     "task_name": "anbn@LSTM",
@@ -97,8 +91,8 @@ anbnLSTMconfig = {
      "load_model": r"anbn@LSTM_1.00_0.80@1118",
     }
 
-anbnGRUconfig.update(anbnconfig)
-anbnLSTMconfig.update(anbnconfig)
+anbngruConfig.update(anbn, **gru)
+anbnLSTMconfig.update(anbn)
 anbncnconfig = {
     "input_size": 5,
     "hidden_size": 4,
@@ -117,7 +111,7 @@ anbncnconfig = {
     "model_class": RNN,
     "load_model": r"anbn@LSTM_1.00_0.80@1118",
     }
-anbncnconfig.update(basicConfig)
+anbncnconfig.update(basic)
 sd = Save_data(file_name="stackrnn/sdata/hotmap")
 
 dyck1config = {
@@ -139,20 +133,24 @@ dyck1config = {
     "load_model": r"anbn@LSTM_1.00_0.80@1118",
     
     }
-dyck1config.update(basicConfig)
-dyck2config = {
-    "task_name": "dyck2@Stack",     
-    "data_name": "dyck2",
+dyck1config.update(basic)
+anbnStackRNNconfig = {
+    "input_size": 4,
+    "hidden_size": 2,
+    "output_size": 3,
+    "alphabet": {"a": [2], "b": [3], "s": [0], "e": [1], "#": [1]},
+    "classes": {"3": [1, 1, 0], "6": [0, 1, 1], "4": [0, 0, 1], "1": [1, 0, 0]},
+    "train_path": r"../data_predicttask/countlanguage",
+    "test_path": r"../data_predicttask/countlanguage",
+    "task_name": "anbn@Stack",     
+    "data_name": "anbn",
     "model_name": "Stack",
     "task_class": StackRNNTask,
-    "model_class": StackRNNCell,
-    "alphabet": {"(": [0], ")": [1], "s": [2], "e": [3], "#": [3], "[": [4], "]": [5]},
-    "classes": {"0": 0, "1": 1},
-    "read_size": 4,
+    "model_class": StackRNN,
+    'cell_class': StackRNNCell,
+    "read_size": 2,
     "n_args": 2,
-    "train_path": r"../data/dyck2",
-    "test_path": r"../data/dyck2",
-    "load_model": r"dyck2@Stack_0.07_0.94@250128",
+    "load_model": r"anbn@Stack_0.00_0.00@1906",
     "load_path": r"stackrnn/smodel",
     "saved_path": r"stackrnn/smodel",
     "sigmoid_type": HardSigmoid,
@@ -163,10 +161,10 @@ dyck2config = {
     "batch_callback": [],
     "step_callback":[]
             }
-dyck2config.update(basicConfig)
+anbnStackRNNconfig.update(basic)
 
 if __name__ == "__main__":
-    config_dict = anbnGRUconfig
+    config_dict = anbnStackRNNconfig
     task = config_dict["task_class"](config_dict)
     task.experiment()
     

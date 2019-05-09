@@ -63,7 +63,6 @@ class RNNTask(Task):
         batch_loss = 0
         total = 0
         correct = 0
-        steps = xs.shape[1]
         batch_size = xs.shape[0]
         self.model.init()
         yp = self.model(xs)

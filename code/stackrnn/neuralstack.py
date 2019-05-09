@@ -14,10 +14,6 @@ class NeuralMemory(nn.Module):
         readcontent = self.read(u)
         self.pop(u)
         return readcontent
-    def init(self):
-        self._values = list()
-        self._S = list()
-        self._actual = torch.zeros(self.batch_size, 1).to(self.device)
     def push(self, strength1, strength2, value1, value2):
         self._actual = self._actual + strength1 + strength2
         self._values.append(value1)
@@ -70,6 +66,4 @@ class NeuralQueue(NeuralMemory):
     def _read_indices(self):
         return list(range(0, len(self._S)))
 if __name__ == "__main__":
-    from  mystackrnn.profile import config_dyck2
-    ns = NeuralStack(config_dyck2)
-    print(ns)
+    pass

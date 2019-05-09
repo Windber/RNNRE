@@ -1,59 +1,75 @@
-from abc import ABCMeta, abstractmethod, abstractproperty
-import numpy as np
 import torch
 import torch.nn as nn
-import torch.optim as optim
-import sys
-import pandas as pd
-import random
-import time
-from stackrnn.neuralcontroller import GRUController
-from stackrnn.neuralstack import NeuralStack
+from torch.optim import RMSprop
 from stackrnn.task import Task
+from stackrnn.initialization import gru_init_, linear_init_
+class StackRNN(nn.Module):
+    def __init__(self, config_dict):
+        super().__init__()
+        self.params = config_dict
+        self.cell = self.cell_class(config_dict).to(self.device)
+        self.o_linear = nn.Linear(self.hidden_size, self.output_size).to(self.device)
+        self.nl = nn.Sigmoid()
+        
+        self.read = None
+        self.hidden = None
+        
+        if self.initialization:
+            linear_init_(self.o_linear)
+    def forward(self, x):
+        steps = x.shape[1]
+        outputs = list()
+        for i in range(steps):
+            self.hidden, self.read = self.cell(x[:, i, :], self.hidden, self.read)
+            output = self.nl(self.o_linear(self.hidden))
+            outputs.append(torch.unsqueeze(output, 1))
+        outputs = torch.cat(outputs, 1)
+        return outputs        
+    
+    def init(self):
+        self.read = torch.zeros(self.batch_size, self.read_size).to(self.device)
+        self.hidden = torch.zeros((self.batch_size, self.hidden_size)).to(self.device)
+        
+        self.cell.stack._values = list()
+        self.cell.stack._S = list()
+        self.cell.stack._actual = torch.zeros(self.batch_size, 1).to(self.device)
+    def __getattr__(self, name):
+        if name in self.params:
+            return self.params[name]
+        else:
+            return super().__getattr__(name)
+        
 class StackRNNTask(Task):
     def __init__(self, config_dict):
         super().__init__(config_dict)
-        self.loss_classify = nn.CrossEntropyLoss(weight=torch.tensor(self.class_weight), reduction='sum')
-        self.loss_stacklength = nn.MSELoss(reduction='sum')
-        self.optimizer = torch.optim.RMSprop(self.model.parameters())
-    def perbatch(self, bx, by, b, istraining):
-        bsize = self.batch_size
-        steps = bx.shape[1]
-        btotal = bsize * steps
-        yp = torch.zeros((bsize, steps, self.output_size)).to(self.device)
-        for i in range(steps):
-            outp = self.model(bx[:, i, :])
-            yp[:, i, :] = outp
-            
-            for scb in self.step_callback:
-                scb.step_cb(self.model, bx[:, i, :], by[:, i], yp[:, i, :])
-                
+        self.cel = nn.MSELoss(reduction="sum")
+        self.optim = RMSprop(self.model.parameters(), lr=self.lr)
+    def perbatch(self, xs, ys, bn, istraining):
+        batch_loss = 0
+        total = 0
+        correct = 0
+        batch_size = xs.shape[0]
+        self.model.init()
+        yp = self.model(xs)
+        total = batch_size
         
-        _, yp_index = torch.topk(yp, 1, dim=2)
-        yp_index = yp_index.view(yp_index.shape[0], yp_index.shape[1])
-        bcorrect = torch.sum( yp_index == by).item()
-        yp = yp.view(-1, 2)
-        ys = by.view(-1)
-        bloss = self.loss_classify(yp, ys)
-        slen = self.model.struct._actual.view(-1)
-        stackloss = torch.zeros(1)
-        for i in range(self.batch_size):
-            if ys[i].item() == 1:
-                stackloss = stackloss + self.loss_stacklength(slen[i], torch.zeros(1).to(self.device))
-        bloss = (1-sum(self.loss_weight)) * bloss + self.loss_weight[0] * stackloss
+        yc = yp.clone().detach()
+        yc.apply_(lambda x: 1. if x >=0.5 else 0.)
+        yc = yc!=ys
+        yc = torch.sum(yc, dim=(1, 2))
+        yc.apply_(lambda x: 1. if x == 0. else 0.)
+        correct = torch.sum(yc).item()
+        
+        yp = yp.view(-1, self.output_size)
+        ys = ys.view(-1, self.output_size)
+        batch_loss = self.cel(yp, ys)
+        stack_loss = self.cel(self.model.cell.stack._actual, torch.zeros(self.batch_size, 1))
+        batch_loss = batch_loss + stack_loss
         if istraining:
-            self.optimizer.zero_grad()
-            bloss.backward()
-            self.optimizer.step()
+            self.optim.zero_grad()
+            batch_loss.backward()
+            self.optim.step()
         if self.verbose:
-            print("Batch %d Loss: %f Accuracy: %f" % (b, bloss / btotal, bcorrect / btotal))
-            
-        for bcb in self.batch_callback:
-            bcb.batch_cb(self.model, bx, by, yp)
-            
-        return bloss, bcorrect, btotal
-    
-    def perstep(self):
-        pass
-    
+            print("Train batch %d Loss: %f Accuracy: %f" % (bn, batch_loss / total, correct / total))
+        return batch_loss.item(), correct, total
 
