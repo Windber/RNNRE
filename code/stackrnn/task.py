@@ -84,10 +84,9 @@ class Task:
             eloss += bloss
             etotal += btotal
             ecorrect += bcorrect
-        eavgloss = eloss / etotal
-        eaccuracy = ecorrect / etotal
+        eavgloss = eloss / etotal if etotal != 0 else 1000.
+        eaccuracy = ecorrect / etotal if etotal != 0 else 0.
         print("Epoch %d Loss: %f Accuracy: %f" % (e+1, eavgloss, eaccuracy))
-        print("Loss==0: " + str(eavgloss==0.))
         return eavgloss, eaccuracy
     
     def __getattr__(self, name):

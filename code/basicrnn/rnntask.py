@@ -12,7 +12,7 @@ class RNN(nn.Module):
     def __init__(self, params):
         super().__init__()
         self.params = params
-        self.cell = self.cellclass(self.input_size, self.hidden_size)
+        self.cell = self.cell_class(self.input_size, self.hidden_size)
         self.hidden = None
         self.linear = nn.Linear(self.hidden_size, self.output_size)
         self.nonlinear = nn.Sigmoid()

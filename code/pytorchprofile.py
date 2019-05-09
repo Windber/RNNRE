@@ -8,16 +8,16 @@ from stackrnn.callback import Save_data
 basicConfig = {
     "batch_size": 10,
     "epochs": 10,
-    "testfile_num": 5,
-    "lr": 1e-3,
-    "load": True,
+    "testfile_num": 2,
+    "lr": 1e-4,
+    "load": False,
     "device": torch.device("cpu"),
     "verbose": False,
     "threshold": 0.05,
-    "debug": False,
+    "debug": True,
     "onlytest": False,
     "verbose_batch": 0,
-    "initialization": False,
+    "initialization": True,
     }
 tomitaConfig = {
     "alphabet": {"0": [0], "1": [1], "s": [2], "e": [3], "#": [3]},
@@ -71,7 +71,7 @@ anbnconfig = {
     "task_name": "anbn@LSTM",
     "data_name": "anbn",
     "model_name": "LSTM",
-    "cellclass": nn.LSTMCell,
+    "cell_class": nn.LSTMCell,
     "task_class": RNNTask,
     "model_class": RNN,
     "load_model": r"anbn@LSTM_1.00_0.80@1118",
@@ -91,7 +91,7 @@ anbncnconfig = {
     "task_name": "anbncn@GRU",
     "data_name": "anbncn",
     "model_name": "GRU",
-    "cell": nn.GRU,
+    "cell_class": nn.GRU,
     "task_class": RNNTask,
     "model_class": RNN,
     "load_model": r"anbn@LSTM_1.00_0.80@1118",
@@ -99,6 +99,26 @@ anbncnconfig = {
 anbncnconfig.update(basicConfig)
 sd = Save_data(file_name="stackrnn/sdata/hotmap")
 
+dyck1config = {
+    "input_size": 4,
+    "hidden_size": 3,
+    "output_size": 3,
+    "alphabet": {"(": [2], ")": [3], "s": [0], "e": [1]},
+    "classes": {"1": [1, 0, 0], "3": [1, 1, 0], "6": [0, 1, 1]},
+    "train_path": r"../data_predicttask/countlanguage",
+    "test_path": r"../data_predicttask/countlanguage",
+    "load_path": r"basicrnn/smodel",
+    "saved_path": r"basicrnn/smodel",
+    "task_name": "dyck1@LSTM",
+    "data_name": "dyck1",
+    "model_name": "LSTM",
+    "cell_class": nn.LSTMCell,
+    "task_class": RNNTask,
+    "model_class": RNN,
+    "load_model": r"anbn@LSTM_1.00_0.80@1118",
+    
+    }
+dyck1config.update(basicConfig)
 dyck2config = {
     "task_name": "dyck2@Stack",     
     "data_name": "dyck2",
@@ -125,7 +145,7 @@ dyck2config = {
 dyck2config.update(basicConfig)
 
 if __name__ == "__main__":
-    config_dict = anbnconfig
+    config_dict = dyck1config
     task = config_dict["task_class"](config_dict)
     task.experiment()
     

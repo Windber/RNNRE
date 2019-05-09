@@ -37,7 +37,7 @@ class Dyck1:
         stack = list()
         sl = list(s)
         output = ''
-        
+        # 3 1 6 
         shex = hex(self.classes['('] + self.classes['e'])
         ehex = hex(self.classes['e'])
         lhex = hex(self.classes['('] + self.classes[')'])
@@ -58,8 +58,8 @@ class Dyck1:
                     output += rhex[1]
                 else:
                     output += rhex[0]
-            output = shex + output + ehex
-            feature = 's' + s + 'e'
+        output = shex + output + ehex
+        feature = 's' + s + 'e'
         return feature, output, length, depth
         
     def pad(self, f, l, p):
@@ -85,7 +85,7 @@ d1 = Dyck1(V=["S", "A", "B", "C"],
             )
   
 second = True
-iter = 10000
+iter = 100
 if __name__ == "__main__":   
     g = [d1]
     for i in range(1):
