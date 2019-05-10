@@ -6,11 +6,11 @@ from stackrnn.nlfunction import *
 from stackrnn.stackrnncell import StackRNNCell
 from stackrnn.callback import Save_data
 basic = {
-    "batch_size": 100,
+    "batch_size": 50,
     "epochs": 50,
     "testfile_num": 2,
     "lr": 1e-1,
-    "load": True,
+    "load": False,
     "device": torch.device("cpu"),
     "verbose": False,
     "debug": False,
@@ -150,7 +150,7 @@ anbnStackRNNconfig = {
     'cell_class': StackRNNCell,
     "read_size": 2,
     "n_args": 2,
-    "load_model": r"anbn@Stack_0.00_0.00@1651",
+    "load_model": r"anbn@Stack_0.66_0.43@1747",
     "load_path": r"stackrnn/smodel",
     "saved_path": r"stackrnn/smodel",
     "sigmoid_type": HardSigmoid,
