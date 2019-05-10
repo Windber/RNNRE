@@ -81,9 +81,36 @@ class Tomita:
             return "".join(output), "1"
         else:
             return "".join(output), "0"
-
-propab = [1/4, 1/2, 3/4]
+    
+    def predict(self, s, padding, pred_class={'e': 1, '0': 2, '1': 4}):
+        cur = self.FSA.Q0
+        l = list(s)
+        output = list()
+        
+        tmp = 0
+        for i in self.Grammar.P['A'][0]:
+            tmp += pred_class[i[0]]
+        tmp += pred_class['e']
+        output.append(hex(tmp))
+        
+        while l:
+            t = l.pop(0)
+            cur = self.FSA.rDELTA[(cur, t)]
+            tmp = 0
+            for i in self.Grammar.P[cur][0]:
+                tmp += pred_class[i[0]]
+            tmp += pred_class['e']
+            output.append(hex(tmp))
+        output.append(hex(pred_class['e']))
+        output = ''.join(output)
+        length = len(s)
+        feature = 's' + s + 'e' + 'e' * (padding - length - 2)
+        label = output + hex(pred_class['e'])*(padding - length - 2)
+        return feature, label
+        
+propab = [1/4, 1/2, 3/4, 7/8]
 negmaxlen = 256
+pred_class= {'e': 1, '0': 2, '1': 4}
 g1 = Tomita(V=["A"], 
      T=["0", "1"], 
      S="A",
@@ -154,7 +181,7 @@ g4 = Tomita(V=["A", "B", "C"],
             "D": [("1", "D"), ("0", "D")]
             },
      propab=propab,
-     name="Tomita4"
+     name="T4_"
      )
 g5 = Tomita(V=["A", "B", "C", "D"], 
      T=["0", "1"], 
@@ -218,76 +245,73 @@ g7 = Tomita(V=["A", "B", "C", "D"],
 if __name__ == "__main__":
     
     second = True
-    iter = 10000
+    iter = 100000
 
-    g = [g1, g2, g3, g4, g5, g6, g7]
-    for i in range(7):
-        l032 = set()
-        l3264 = set()
-        l64128 = set()
-        l128256 = set()
+    g = [g4]
+    #g = [g1, g2, g3, g4, g5, g6, g7]
+    for i in range(len(g)):
+        test1 = set()
+        test2 = set()
+        test3 = set()
+        test4 = set()
+        test5 = set()
         hook = None
         padding = None
         for _ in range(iter):
             s = g[i].generate()
-            serial, label = g[i].accept(s)
-            sn = g[i].negative(s, random.randint(1, 256))
-            s = "s" + s + "e"
-            serial = "0" + serial + serial[-1]
-            if sn:
-                serialn, labeln = g[i].accept(sn)
-                sn = "s" + sn + "e"
-                serialn = "0" + serialn + serialn[-1]
-            length = len(s)
+            length = len(s) + 2
             if length <= 32:
-                hook = l032
+                hook = test1
                 padding = 32
             elif length <= 64:
-                hook = l3264
+                hook = test2
                 padding = 64
             elif length <= 128:
-                hook = l64128
+                hook = test3
                 padding = 128
-            else:
-                hook = l128256
+            elif length <= 256:
+                hook = test4
                 padding = 256
-            if length <= 256:
-                s = s + "#" * (padding - length)
-                serial = serial + serial[-1] * (padding - length)
-                hook.add((length, label, s, serial))
-                if sn:
-                    sn = sn + "#" * (padding - length)
-                    serialn = serialn + serialn[-1] * (padding - length)
-                    hook.add((length, labeln, sn, serialn))
-                     
-                 
+            elif length <= 512:
+                hook = test5
+                padding = 512
+            if padding:
+                feature, label = g[i].predict(s, padding)
+                hook.add((feature, label))
         if second: 
-            if os.stat(str(g[i]) + "l032").st_size != 0:   
-                ol032 = pd.read_csv(str(g[i]) + "l032", header=None, index_col=None, dtype={1: str})
-                oll032 = ol032.values.tolist()
-                olll032 = set(list(map(tuple, oll032)))
-                l032 = olll032.union(l032)
-            if os.stat(str(g[i]) + "l3264").st_size != 0:   
-                ol3264 = pd.read_csv(str(g[i]) + "l3264", header=None, index_col=None, dtype={1: str})
-                oll3264 = ol3264.values.tolist()
-                olll3264 = set(list(map(tuple, oll3264)))
-                l3264 = olll3264.union(l3264)
-            if os.stat(str(g[i]) + "l64128").st_size != 0:   
-                ol64128 = pd.read_csv(str(g[i]) + "l64128", header=None, index_col=None, dtype={1: str})
-                oll64128 = ol64128.values.tolist()
-                olll64128 = set(list(map(tuple, oll64128)))
-                l64128 = olll64128.union(l64128)
-            if os.stat(str(g[i]) + "l128256").st_size != 0:   
-                ol128256 = pd.read_csv(str(g[i]) + "l128256", header=None, index_col=None, dtype={1: str})
-                oll128256 = ol128256.values.tolist()
-                olll128256 = set(list(map(tuple, oll128256)))
-                l128256 = olll128256.union(l128256)
-        df032 = pd.DataFrame(list(l032))
-        df032.to_csv(str(g[i]) + "l032", header=None, index=False)
-        df3264 = pd.DataFrame(list(l3264))
-        df3264.to_csv(str(g[i]) + "l3264", header=None, index=False)
-        df64128 = pd.DataFrame(list(l64128))
-        df64128.to_csv(str(g[i]) + "l64128", header=None, index=False)
-        df128256 = pd.DataFrame(list(l128256))
-        df128256.to_csv(str(g[i]) + "l128256", header=None, index=False)
-        print(g[i], len(l032), len(l3264), len(l64128), len(l128256))
+            if os.stat(str(g[i]) + "test1").st_size != 0:   
+                otest1 = pd.read_csv(str(g[i]) + "test1", header=None, index_col=None, dtype={1: str})
+                oltest1 = otest1.values.tolist()
+                olltest1 = set(list(map(tuple, oltest1)))
+                test1 = olltest1.union(test1)
+            if os.stat(str(g[i]) + "test2").st_size != 0:   
+                otest2 = pd.read_csv(str(g[i]) + "test2", header=None, index_col=None, dtype={1: str})
+                oltest2 = otest2.values.tolist()
+                olltest2 = set(list(map(tuple, oltest2)))
+                test2 = olltest2.union(test2)
+            if os.stat(str(g[i]) + "test3").st_size != 0:   
+                otest3 = pd.read_csv(str(g[i]) + "test3", header=None, index_col=None, dtype={1: str})
+                oltest3 = otest3.values.tolist()
+                olltest3 = set(list(map(tuple, oltest3)))
+                test3 = olltest3.union(test3)
+            if os.stat(str(g[i]) + "test4").st_size != 0:   
+                otest4 = pd.read_csv(str(g[i]) + "test4", header=None, index_col=None, dtype={1: str})
+                oltest4 = otest4.values.tolist()
+                olltest4 = set(list(map(tuple, oltest4)))
+                test4 = olltest4.union(test4)
+            if os.stat(str(g[i]) + "test5").st_size != 0:   
+                otest5 = pd.read_csv(str(g[i]) + "test5", header=None, index_col=None, dtype={1: str})
+                oltest5 = otest5.values.tolist()
+                olltest5 = set(list(map(tuple, oltest5)))
+                test5 = olltest5.union(test5)
+        dftest1 = pd.DataFrame(list(test1))
+        dftest1.to_csv(str(g[i]) + "test1", header=None, index=False)
+        dftest2 = pd.DataFrame(list(test2))
+        dftest2.to_csv(str(g[i]) + "test2", header=None, index=False)
+        dftest3 = pd.DataFrame(list(test3))
+        dftest3.to_csv(str(g[i]) + "test3", header=None, index=False)
+        dftest4 = pd.DataFrame(list(test4))
+        dftest4.to_csv(str(g[i]) + "test4", header=None, index=False)
+        dftest5 = pd.DataFrame(list(test5))
+        dftest5.to_csv(str(g[i]) + "test5", header=None, index=False)
+        print(g[i], len(test1), len(test2), len(test3), len(test4), len(test5))
