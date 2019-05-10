@@ -256,8 +256,8 @@ g7 = Tomita(V=["A", "B", "C", "D"],
      )
 if __name__ == "__main__":
     
-    second = True
-    iter = 10
+    second = False
+    iter = 10000
 
     
     g = [g1, g2, g3, g4, g5, g6, g7]
