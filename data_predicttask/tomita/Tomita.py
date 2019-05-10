@@ -87,20 +87,31 @@ class Tomita:
         l = list(s)
         output = list()
         
-        tmp = 0
-        for i in self.Grammar.P['A'][0]:
-            tmp += pred_class[i[0]]
-        tmp += pred_class['e']
-        output.append(hex(tmp))
+        tmp = set()
+        htmp = 0
+        for i in self.Grammar.P['A']:
+            for j in i:
+                tmp.add(j[0])
+        if self.FSA.Q0 in self.FSA.F:
+            tmp.add('e')
+        for i in tmp:
+            htmp += pred_class[i]
+        output.append(hex(htmp))
         
         while l:
             t = l.pop(0)
             cur = self.FSA.rDELTA[(cur, t)]
-            tmp = 0
-            for i in self.Grammar.P[cur][0]:
-                tmp += pred_class[i[0]]
-            tmp += pred_class['e']
-            output.append(hex(tmp))
+            tmp = set()
+            htmp = 0
+            for i in self.Grammar.P[cur]:
+                for j in i:
+                    tmp.add(j[0])
+            if cur in self.FSA.F:
+                tmp.add('e')
+            for i in tmp:
+                htmp += pred_class[i]
+            output.append(hex(htmp))
+            
         output.append(hex(pred_class['e']))
         output = ''.join(output)
         length = len(s)
@@ -108,8 +119,8 @@ class Tomita:
         label = output + hex(pred_class['e'])*(padding - length - 2)
         return feature, label
         
-#propab = [1/4, 1/2, 3/4, 7/8, 15/16, 31/32, 63/64, 127/128]
-propab = [31/32, 63/64, 15/16, 7/8]
+propab = [1/4, 1/2, 3/4, 7/8, 15/16, 31/32, 63/64, 127/128]
+#propab = [31/32, 63/64, 15/16, 7/8]
 negmaxlen = 256
 pred_class= {'e': 1, '0': 2, '1': 4}
 g1 = Tomita(V=["A"], 
@@ -246,10 +257,10 @@ g7 = Tomita(V=["A", "B", "C", "D"],
 if __name__ == "__main__":
     
     second = True
-    iter = 10000
+    iter = 10
 
     
-    g = [g1]
+    g = [g1, g2, g3, g4, g5, g6, g7]
     for i in range(len(g)):
         test1 = set()
         test2 = set()
