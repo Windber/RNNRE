@@ -68,7 +68,7 @@ class Dyck1:
         feature = f + 'e' * (p - length)
         label = l + ehex * (p - length)
         return feature, label
-propab = [15/32, 31/64, 63/128, 127/256, 255/512, 511/1024, 1023/2048]
+propab = [15/32, 31/64, 63/128, 127/256]
 d1 = Dyck1(V=["S", "A", "B", "C"],
             T=["(", ")"],
             S="S",
