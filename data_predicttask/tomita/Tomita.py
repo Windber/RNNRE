@@ -119,8 +119,9 @@ class Tomita:
         label = output + hex(pred_class['e'])*(padding - length - 2)
         return feature, label
         
-propab = [1/4, 1/2, 3/4, 7/8, 15/16, 31/32, 63/64, 127/128]
+#propab = [1/4, 1/2, 3/4, 7/8, 15/16, 31/32, 63/64, 127/128]
 #propab = [31/32, 63/64, 15/16, 7/8]
+propab = [1/4, 1/2, 3/4, 1/8]
 negmaxlen = 256
 pred_class= {'e': 1, '0': 2, '1': 4}
 g1 = Tomita(V=["A"], 
@@ -256,11 +257,11 @@ g7 = Tomita(V=["A", "B", "C", "D"],
      )
 if __name__ == "__main__":
     
-    second = False
-    iter = 10000
+    second = True
+    iter = 100000
 
     
-    g = [g1, g2, g3, g4, g5, g6, g7]
+    g = [g3]
     for i in range(len(g)):
         test1 = set()
         test2 = set()
