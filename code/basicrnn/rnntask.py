@@ -27,7 +27,7 @@ class RNN(nn.Module):
         self.cell.to(self.device)
         self.linear.to(self.device)
     def init(self):
-        if self.model_name == 'GRU' or self.model_name == 'RNN':
+        if self.model_name == 'GRU' or self.model_name == 'SRN':
             self.hidden = torch.zeros(self.batch_size, self.hidden_size)
         elif self.model_name == 'LSTM':
             self.hidden = (torch.zeros(self.batch_size, self.hidden_size).to(self.device), 

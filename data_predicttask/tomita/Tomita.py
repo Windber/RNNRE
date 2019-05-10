@@ -108,7 +108,7 @@ class Tomita:
         label = output + hex(pred_class['e'])*(padding - length - 2)
         return feature, label
         
-propab = [1/4, 1/2, 3/4, 7/8]
+propab = [1/4, 1/2, 3/4, 7/8, 15/16, 31/32, 63/64, 127/128]
 negmaxlen = 256
 pred_class= {'e': 1, '0': 2, '1': 4}
 g1 = Tomita(V=["A"], 
@@ -124,7 +124,7 @@ g1 = Tomita(V=["A"],
             "B": [("1", "B"), ("0", "B")]
             },
      propab=propab,
-     name="Tomita1"
+     name="t1_"
      )
 g2 = Tomita(V=["A", "B"], 
      T=["0", "1"], 
@@ -141,7 +141,7 @@ g2 = Tomita(V=["A", "B"],
             "C": [("0", "C"), ("1", "C")]
             },
      propab=propab,
-     name="Tomita2"
+     name="t2_"
      )
 g3 = Tomita(V=["A", "B", "C", "D"], 
      T=["0", "1"], 
@@ -162,7 +162,7 @@ g3 = Tomita(V=["A", "B", "C", "D"],
             "E": [("0", "E"), ("1", "E")]
             },
      propab=propab,
-     name="Tomita3"
+     name="t3_"
      )
 g4 = Tomita(V=["A", "B", "C"], 
      T=["0", "1"], 
@@ -181,7 +181,7 @@ g4 = Tomita(V=["A", "B", "C"],
             "D": [("1", "D"), ("0", "D")]
             },
      propab=propab,
-     name="T4_"
+     name="t4_"
      )
 g5 = Tomita(V=["A", "B", "C", "D"], 
      T=["0", "1"], 
@@ -201,7 +201,7 @@ g5 = Tomita(V=["A", "B", "C", "D"],
             "D": [("0", "B"), ("1", "C")]
             },
      propab=propab,
-     name="Tomita5"
+     name="t5_"
      )
 g6 = Tomita(V=["A", "B", "C"], 
      T=["0", "1"], 
@@ -219,7 +219,7 @@ g6 = Tomita(V=["A", "B", "C"],
             "C": [("1", "A"), ("0", "B")],
             },
      propab=propab,
-     name="Tomita6"
+     name="t6_"
      )
 g7 = Tomita(V=["A", "B", "C", "D"], 
      T=["0", "1"], 
@@ -240,26 +240,27 @@ g7 = Tomita(V=["A", "B", "C", "D"],
             "E": [("1", "E"), ("0", "E")]
             },
      propab=propab,
-     name="Tomita7"
+     name="t7_"
      )
 if __name__ == "__main__":
     
     second = True
-    iter = 100000
+    iter = 10000
 
-    g = [g4]
-    #g = [g1, g2, g3, g4, g5, g6, g7]
+    
+    g = [g3, g5, g6, g7]
     for i in range(len(g)):
         test1 = set()
         test2 = set()
         test3 = set()
         test4 = set()
         test5 = set()
-        hook = None
-        padding = None
+
         for _ in range(iter):
             s = g[i].generate()
             length = len(s) + 2
+            hook = None
+            padding = None
             if length <= 32:
                 hook = test1
                 padding = 32
