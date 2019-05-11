@@ -88,9 +88,10 @@ class Dyck2:
 
 
 if __name__ == "__main__":
-    propab = [15/32, 31/64, 63/128, 127/256, 1/2]
-    second = False
-    iter = 1000
+    propab = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    second = True
+    iter = 100000
+
     
     d2 = Dyck2(V=["S", "R", "B", "T"],
                 T=["(", ")", "[", "]"],
