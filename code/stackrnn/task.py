@@ -10,8 +10,6 @@ import sys
 import pandas as pd
 import random
 import time
-from stackrnn.neuralcontroller import GRUController
-from stackrnn.neuralstack import NeuralStack
 class Task:
     def __init__(self, config_dict):
         self.params = config_dict
@@ -54,12 +52,14 @@ class Task:
         for e in range(self.epochs):
             eloss, eacc = self.perepoch(self.trainx, self.trainy, e, True)
             e += 1
-            testloss, testeacc = self.test()
-            if eloss <= self.minloss and eacc >= self.maxaccuracy and testeacc >= self.maxtestaccuracy:
+#             testloss, testacc = self.test()
+            testloss = 0
+            testacc = 1
+            if eloss <= self.minloss and eacc >= self.maxaccuracy and testacc >= self.maxtestaccuracy:
                 self.state = self.model.state_dict()
                 self.minloss = eloss
                 self.maxaccuracy = eacc
-                self.maxtestaccuracy = testeacc
+                self.maxtestaccuracy = testacc
                 save_model = self.saved_path + "/" + self.task_name + "_%.2f_%.2f" % (self.maxaccuracy, self.maxtestaccuracy) + "@" + time.strftime("%H%M")
                 torch.save([self.state, self.minloss, self.maxaccuracy, self.maxtestaccuracy], 
                            save_model)

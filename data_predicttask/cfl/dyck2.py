@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 import re
-class Dyck1:
+class Dyck2:
     class Grammar:
         def __init__(self, V, T, S, P):
             self.V = V
@@ -11,11 +11,11 @@ class Dyck1:
             self.S = S
             self.P = P
     def __init__(self, V, T, S, P, prob, name, diction):
-        self.Grammar = Dyck1.Grammar(V, T, S, P)
+        self.Grammar = Dyck2.Grammar(V, T, S, P)
         self.prob = prob
         self.name = name
         self.diction = diction
-        self.classes = {'e': 1, '(': 2, ')': 4}
+        self.classes = {'e': 1, '(': 2, ')': 4, '[': 8, ']': 16}
     def __str__(self):
         return self.name
     def generate(self):
@@ -30,6 +30,8 @@ class Dyck1:
             rselect = rselect if len(self.Grammar.P[replace][rselect]) > 0 else 1- rselect
             replace = self.Grammar.P[replace][rselect][random.randint(0, len(self.Grammar.P[replace][rselect]) - 1)]
             cur = cur[:mat.start(0)] + replace + cur[mat.end(0):]
+            if len(cur) > 510:
+                return 'secret'
         return cur
     def accept(self, s):
         depth = 0
@@ -37,14 +39,16 @@ class Dyck1:
         stack = list()
         sl = list(s)
         output = ''
-        # 3 1 6 
-        shex = hex(self.classes['('] + self.classes['e'])
+        # 11 1 14 26  
+        shex = hex(self.classes['('] + self.classes['e'] + self.classes['['])
         ehex = hex(self.classes['e'])
-        lhex = hex(self.classes['('] + self.classes[')'])
-        rhex = [hex(self.classes['('] + self.classes[')']), hex(self.classes['('] + self.classes['e']) ]
+        slhex = hex(self.classes['('] + self.classes[')'] + self.classes['['])
+        mlhex = hex(self.classes['('] + self.classes[']'] + self.classes['['])
+        srhex = [hex(self.classes['('] + self.classes[')'] + self.classes['[']), hex(self.classes['('] + self.classes[']'] + self.classes['[']), hex(self.classes['('] + self.classes['e'] + self.classes['[']) ]
+        mrhex = [hex(self.classes['('] + self.classes[')'] + self.classes['[']), hex(self.classes['('] + self.classes[']'] + self.classes['[']), hex(self.classes['('] + self.classes['e'] + self.classes['[']) ]
         for c in sl:
             if stack:
-                if stack[-1] == "(" and c == ")":
+                if (stack[-1] == "(" and c == ")") or ( ( stack[-1] == "[" and c == "]" )):
                     stack.pop()
                 else:
                     stack.append(c)
@@ -52,12 +56,25 @@ class Dyck1:
                 stack.append(c)
             depth = max(depth, len(stack))
             if c == '(':
-                output += lhex
-            else:
+                output += slhex
+            elif c == '[':
+                output += mlhex
+            elif c == ')':
                 if stack:
-                    output += rhex[0]
+                    if stack[-1] == '(':
+                        output += srhex[0]
+                    elif stack[-1] == '[':
+                        output += srhex[1]
                 else:
-                    output += rhex[1]
+                    output += srhex[2]
+            elif c == ']':
+                if stack:
+                    if stack[-1] == '(':
+                        output += mrhex[0]
+                    elif stack[-1] == '[':
+                        output += mrhex[1]
+                else:
+                    output += mrhex[2]                    
         output = shex + output + ehex
         feature = 's' + s + 'e'
         return feature, output, length, depth
@@ -68,27 +85,30 @@ class Dyck1:
         feature = f + 'e' * (p - length)
         label = l + ehex * (p - length)
         return feature, label
-propab = [15/32, 31/64, 63/128, 127/256]
-second = False
-iter = 10
-d1 = Dyck1(V=["S", "A", "B", "C"],
-            T=["(", ")"],
-            S="S",
-            P={"S": [[], ["AS", "A"]],
-               "A": [["C"], ["B"]],
-               "B": [[], ["(S)"]],
-               "C": [["()"], []]
-               },
-            prob=propab,
-            name="dyck1",
-            diction={0: "(",
-                    1: ")",
-                    }
-            )
-  
 
-if __name__ == "__main__":   
-    g = [d1]
+
+if __name__ == "__main__":
+    propab = [15/32, 31/64, 63/128, 127/256, 1/2]
+    second = False
+    iter = 1000
+    
+    d2 = Dyck2(V=["S", "R", "B", "T"],
+                T=["(", ")", "[", "]"],
+                S="S",
+                P={"S": [[], ["R", "RS"]],
+                   "R": [["T"], ["B"]],
+                   "B": [[], ["[S]", "(S)"]],
+                   "T": [["()", "[]"], []]
+                   },
+                prob=propab,
+                name="dyck2_",
+                diction={0: "(",
+                        1: ")",
+                        2: "[",
+                        3: "]"
+                        }
+                )
+    g = [d2]
     for i in range(1):
         _test1 = set()
         _test2 = set()
@@ -100,29 +120,30 @@ if __name__ == "__main__":
         count = 0
         while count < iter:
             s = g[i].generate()
-            feature, predict, length, depth = g[i].accept(s)
-            need = True
-            if depth >=0 and depth<=8 and length >= 0 and length <= 32:
-                hook = _test1
-                padding = 32
-            elif depth >8 and depth<=16 and length > 32 and length <= 64:
-                hook = _test2
-                padding = 64
-            elif depth >16 and depth<=32 and length > 64 and length <= 128:
-                hook = _test3
-                padding = 128
-            elif depth >32 and depth<=64 and length > 128 and length <= 256:
-                hook = _test4
-                padding = 256
-            elif depth >64 and depth<=128 and length > 256 and length <= 512:
-                hook = _test5
-                padding = 512
-            else:
-                need = False
-            if need:
-                feature, predict = g[i].pad(feature, predict, padding)
-                hook.add((feature, predict, length, depth))    
-                count += 1            
+            if s != 'secret':
+                feature, predict, length, depth = g[i].accept(s)
+                need = True
+                if depth >=0 and depth<=8 and length >= 0 and length <= 32:
+                    hook = _test1
+                    padding = 32
+                elif depth >8 and depth<=16 and length > 32 and length <= 64:
+                    hook = _test2
+                    padding = 64
+                elif depth >16 and depth<=32 and length > 64 and length <= 128:
+                    hook = _test3
+                    padding = 128
+                elif depth >32 and depth<=64 and length > 128 and length <= 256:
+                    hook = _test4
+                    padding = 256
+                elif depth >64 and depth<=128 and length > 256 and length <= 512:
+                    hook = _test5
+                    padding = 512
+                else:
+                    need = False
+                if need:
+                    feature, predict = g[i].pad(feature, predict, padding)
+                    hook.add((feature, predict, length, depth))    
+                    count += 1            
         if second: 
             if os.stat(str(g[i]) + "_test1").st_size != 0:   
                 o_test1 = pd.read_csv(str(g[i]) + "_test1", header=None, index_col=None, dtype={1: str})

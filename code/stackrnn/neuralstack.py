@@ -25,7 +25,7 @@ class NeuralMemory(nn.Module):
         summary = torch.zeros([self.batch_size, self.read_size]).to(self.device)
         strength_used = torch.zeros(self.batch_size, 1).to(self.device)
         for i in self._read_indices():
-            summary = summary + self._values[i] * torch.min(self._S[i], torch.max(u - strength_used))
+            summary = summary + self._values[i] * torch.min(self._S[i], torch.max(u - strength_used, torch.zeros(self.batch_size, 1)))
             strength_used = strength_used + self._S[i]
         return summary
     

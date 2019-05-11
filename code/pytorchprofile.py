@@ -7,13 +7,12 @@ from stackrnn.stackrnncell import StackRNNCell
 from stackrnn.callback import Save_data
 basic = {
     "batch_size": 100,
-    "epochs": 50,
+    "epochs": 500,
     "testfile_num": 5,
     "lr": 1e-3,
     "device": torch.device("cpu"),
     "verbose": False,
-    "debug": False,
-    "onlytest": True,
+    "debug": True,
     "verbose_batch": 0,
     "initialization": True,
     }
@@ -48,23 +47,7 @@ srn = {
     "cell_class": nn.RNNCell,
     }
 
-stackrnn = {
-    "model_name": "Stack",
-    "task_class": StackRNNTask,
-    "model_class": StackRNN,
-    'cell_class': StackRNNCell,
-    "read_size": 2,
-    "n_args": 2,
-    "load_path": r"stackrnn/smodel",
-    "saved_path": r"stackrnn/smodel",
-    "sigmoid_type": HardSigmoid,
-    "class_weight": [0.5, 0.5],
-    "loss_num": 2,
-    "loss_weight": [0.01],
-    "linear_layers": [8],
-    "batch_callback": [],
-    "step_callback":[]
-}
+
 
 srn.update(rnn)
 lstm.update(rnn)
@@ -335,6 +318,16 @@ dyck1 = {
 }
 dyck1.update(countlanguage)
 
+dyck2 = {
+    "input_size": 6,
+    "hidden_size": 2,
+    "output_size": 5,
+    "alphabet": {"(": [2], ")": [3], "s": [0], "e": [1], '[': 4, ']': 5},
+    "classes": {"1": [1, 0, 0, 0, 0], "b": [1, 1, 0, 1, 0], "e": [0, 1, 1, 1, 0], '1a': [0, 1, 0, 1, 1]}
+}
+dyck1.update(countlanguage)
+
+
 anbncngruconfig = {
     "task_name": "anbncn@gru",
     "load_model": r"anbn@LSTM_1.00_0.80@1118",
@@ -345,20 +338,40 @@ anbncngruconfig.update(gru)
 anbncngruconfig.update(anbncn)
 
 sd = Save_data(file_name="stackrnn/sdata/hotmap")
-
-anbnstackrnnConfig = {
+stackrnn = {
+    "model_name": "Stack",
+    "task_class": StackRNNTask,
+    "model_class": StackRNN,
+    'cell_class': StackRNNCell,
+    'controller_cell_class': nn.RNNCell,
+    "read_size": 2,
+    "n_args": 2,
+    "load_path": r"stackrnn/smodel",
+    "saved_path": r"stackrnn/smodel",
+    "sigmoid_type": HardSigmoid,
+    "class_weight": [0.5, 0.5],
+    "loss_num": 2,
+    "loss_weight": [0.01],
+    "linear_layers": [8],
+    "batch_callback": [],
+    "step_callback":[]
+}
+anbnstacksrnConfig = {
     "hidden_size": 2,
-    "task_name": "anbn@Stack",     
-    "load_model": r'anbn@Stack_0.50_0.24@0345',
+    "task_name": "anbn@stacksrn",     
+    "load_model": r'anbn@stacksrn_1.00_1.00@1702',
     "load": True,
     "onlytest": True,
+    "alpha": 1/32,
+    "customalization": True,
+    'weight_decay': 0,
             }
-anbnstackrnnConfig.update(basic)
-anbnstackrnnConfig.update(anbn)
-anbnstackrnnConfig.update(stackrnn)
+anbnstacksrnConfig.update(basic)
+anbnstacksrnConfig.update(anbn)
+anbnstacksrnConfig.update(stackrnn)
 
 if __name__ == "__main__":
-    config_dict = anbnstackrnnConfig
+    config_dict = anbnstacksrnConfig
     task = config_dict["task_class"](config_dict)
     task.experiment()
     

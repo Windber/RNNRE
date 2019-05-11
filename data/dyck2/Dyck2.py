@@ -30,15 +30,6 @@ class Dyck2:
             replace = self.Grammar.P[replace][rselect][random.randint(0, len(self.Grammar.P[replace][rselect]) - 1)]
             cur = cur[:mat.start(0)] + replace + cur[mat.end(0):]
         return cur
-#     def generate(self):
-#         pairs = random.randint(0, 128)
-#         cur = "()"
-#         length = 0
-#         for i in range(pairs):
-#             length += 2
-#             insert = random.randint(0, length)
-#             cur = cur[:insert] + "()" + cur[insert:]
-#         return cur
     def negative(self, posstring, maxlength):
         iteration = 0
         if posstring:
@@ -56,9 +47,6 @@ class Dyck2:
             iteration += 1
             if iteration > 10:
                 return None
-#                 ran = np.random.randint(0, 2, length)
-#                 ran = "".join(list(map(str, list(ran))))
-                #print("in trap: %s" % (ran))
         return ran
     def accept(self, s):
         depth = 0

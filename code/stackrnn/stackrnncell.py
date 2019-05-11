@@ -1,5 +1,5 @@
 import torch.nn as nn
-from stackrnn.neuralcontroller import GRUController
+from stackrnn.neuralcontroller import RNNController
 from stackrnn.neuralstack import NeuralStack
 import torch
 class StackRNNCell(nn.Module):
@@ -15,7 +15,7 @@ class StackRNNCell(nn.Module):
         self._v2 = None
 
 
-        self.controller = GRUController(config_dict)
+        self.controller = RNNController(config_dict)
         self.stack = NeuralStack(config_dict)
         
 
@@ -23,7 +23,7 @@ class StackRNNCell(nn.Module):
 
     def forward(self, inp, h, r):
         
-        hidden, self._v1, self._v2, (self._s1, self._u)= self.controller(inp, h, r)
+        hidden, self._v1, self._v2, self._s1, self._u= self.controller(inp, h, r)
         
         self._s2 = self._s1.clone()
         
