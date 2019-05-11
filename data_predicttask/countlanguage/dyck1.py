@@ -68,9 +68,9 @@ class Dyck1:
         feature = f + 'e' * (p - length)
         label = l + ehex * (p - length)
         return feature, label
-propab = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-second = True
-iter = 100000
+propab = [0.1, 0.2, 0.3, 0.4]
+second = False
+iter = 100
 d1 = Dyck1(V=["S", "A", "B", "C"],
             T=["(", ")"],
             S="S",
