@@ -25,6 +25,8 @@ class Save_data(Call_back):
     def batch_cb(self, model, *args):
         arr = np.array(self.batch)
         arr = np.transpose(arr, (1, 0, 2))
+        y = args[0].detach().numpy()
+        arr = np.concatenate([arr, y], axis=2)
         self.epoch.append(arr)
         # y = args[1].detach().numpy().reshape(-1, 1)
         self.batch = list()
@@ -33,6 +35,8 @@ class Save_data(Call_back):
         # scb.step_cb(self.model, bx[:, i, :], by[:, i], yp[:, i, :])
         x = args[0].detach().numpy()
         yp = args[1].detach().numpy()
+        read = args[2].detach().numpy()
+        hidden = args[3].detach().numpy()
         s1 = model._s1.detach().numpy()
         s2 = model._s2.detach().numpy()
         u = model._u.detach().numpy()
@@ -40,7 +44,7 @@ class Save_data(Call_back):
         v2 = model._v2.detach().numpy()
         batch_size = model.batch_size
         element_size = 0
-        li = [x, yp, s1, s2, u, v1, v2]
+        li = [ u, hidden, x, s1, s2, read, v1, v2, yp]
         for i in li:
             tmp = i.shape[1] if len(i.shape) > 1 else 1
             element_size += tmp

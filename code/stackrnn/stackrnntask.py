@@ -24,7 +24,7 @@ class StackRNN(nn.Module):
             output = self.nl(self.o_linear(self.hidden))
             outputs.append(torch.unsqueeze(output, 1))
             for scb in self.step_callback:
-                scb.step_cb(self.cell, x[:, i, :], output)
+                scb.step_cb(self.cell, x[:, i, :], output, self.read, self.hidden)
         outputs = torch.cat(outputs, 1)
         
             
@@ -63,7 +63,7 @@ class StackRNNTask(Task):
         yc = torch.sum(yc, dim=(1, 2))
         yc.apply_(lambda x: 1. if x == 0. else 0.)
         correct = torch.sum(yc).item()
-        
+        ytosave = ys
         yp = yp.view(-1, self.output_size)
         ys = ys.view(-1, self.output_size)
         batch_loss = self.cel(yp, ys)
@@ -77,6 +77,6 @@ class StackRNNTask(Task):
         if self.verbose:
             print("Train batch %d Loss: %f Accuracy: %f" % (bn, batch_loss / total, correct / total))
         for bcb in self.batch_callback:
-            bcb.batch_cb(self.model)
+            bcb.batch_cb(self.model, ytosave)
         return batch_loss.item(), correct, total
 
