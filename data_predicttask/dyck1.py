@@ -3,6 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 import re
+import random
 class Dyck1:
     class Grammar:
         def __init__(self, V, T, S, P):
@@ -30,6 +31,8 @@ class Dyck1:
             rselect = rselect if len(self.Grammar.P[replace][rselect]) > 0 else 1- rselect
             replace = self.Grammar.P[replace][rselect][random.randint(0, len(self.Grammar.P[replace][rselect]) - 1)]
             cur = cur[:mat.start(0)] + replace + cur[mat.end(0):]
+            if len(cur) > 510:
+                return 'secret'
         return cur
     def accept(self, s):
         depth = 0
@@ -68,9 +71,9 @@ class Dyck1:
         feature = f + 'e' * (p - length)
         label = l + ehex * (p - length)
         return feature, label
-propab = [0.1, 0.2, 0.3, 0.4]
+propab = [random.random()*0.5 for i in range(10)]
 second = False
-iter = 100
+iter = 100000
 d1 = Dyck1(V=["S", "A", "B", "C"],
             T=["(", ")"],
             S="S",
@@ -100,29 +103,30 @@ if __name__ == "__main__":
         count = 0
         while count < iter:
             s = g[i].generate()
-            feature, predict, length, depth = g[i].accept(s)
-            need = True
-            if depth >=0 and depth<=8 and length >= 0 and length <= 32:
-                hook = _test1
-                padding = 32
-            elif depth >8 and depth<=16 and length > 32 and length <= 64:
-                hook = _test2
-                padding = 64
-            elif depth >16 and depth<=32 and length > 64 and length <= 128:
-                hook = _test3
-                padding = 128
-            elif depth >32 and depth<=64 and length > 128 and length <= 256:
-                hook = _test4
-                padding = 256
-            elif depth >64 and depth<=128 and length > 256 and length <= 512:
-                hook = _test5
-                padding = 512
-            else:
-                need = False
-            if need:
-                feature, predict = g[i].pad(feature, predict, padding)
-                hook.add((feature, predict, length, depth))    
-                count += 1            
+            if s != 'secret':
+                feature, predict, length, depth = g[i].accept(s)
+                need = True
+                if depth >=0 and depth<=8 and length >= 0 and length <= 32:
+                    hook = _test1
+                    padding = 32
+                elif depth >8 and depth<=16 and length > 32 and length <= 64:
+                    hook = _test2
+                    padding = 64
+                elif depth >16 and depth<=32 and length > 64 and length <= 128:
+                    hook = _test3
+                    padding = 128
+                elif depth >32 and depth<=64 and length > 128 and length <= 256:
+                    hook = _test4
+                    padding = 256
+                elif depth >64 and depth<=128 and length > 256 and length <= 512:
+                    hook = _test5
+                    padding = 512
+                else:
+                    need = False
+                if need:
+                    feature, predict = g[i].pad(feature, predict, padding)
+                    hook.add((feature, predict, length, depth))    
+                    count += 1            
         if second: 
             if os.stat(str(g[i]) + "_test1").st_size != 0:   
                 o_test1 = pd.read_csv(str(g[i]) + "_test1", header=None, index_col=None, dtype={1: str})

@@ -23,7 +23,11 @@ class StackRNN(nn.Module):
             self.hidden, self.read = self.cell(x[:, i, :], self.hidden, self.read)
             output = self.nl(self.o_linear(self.hidden))
             outputs.append(torch.unsqueeze(output, 1))
+            for scb in self.step_callback:
+                scb.step_cb(self.cell, x[:, i, :], output)
         outputs = torch.cat(outputs, 1)
+        
+            
         return outputs        
     
     def init(self):
@@ -72,5 +76,7 @@ class StackRNNTask(Task):
             self.optim.step()
         if self.verbose:
             print("Train batch %d Loss: %f Accuracy: %f" % (bn, batch_loss / total, correct / total))
+        for bcb in self.batch_callback:
+            bcb.batch_cb(self.model)
         return batch_loss.item(), correct, total
 

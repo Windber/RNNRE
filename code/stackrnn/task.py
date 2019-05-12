@@ -22,7 +22,7 @@ class Task:
         self.trainx, self.trainy, self.testxl, self.testyl = self.get_data()
         if self.load:
             load_model = self.load_path + "/" + self.load_model
-            self.state, self.minloss, self.maxaccuracy, self.maxtestaccuracy = torch.load(load_model)
+            self.state, self.minloss, self.maxaccuracy = torch.load(load_model)
             self.model.load_state_dict(self.state)
         else:
             self.state = None
@@ -52,16 +52,15 @@ class Task:
         for e in range(self.epochs):
             eloss, eacc = self.perepoch(self.trainx, self.trainy, e, True)
             e += 1
-#             testloss, testacc = self.test()
-            testloss = 0
-            testacc = 1
-            if eloss <= self.minloss and eacc >= self.maxaccuracy and testacc >= self.maxtestaccuracy:
+            if self.validate:
+                testloss, testacc = self.test()
+            
+            if eloss <= self.minloss and eacc >= self.maxaccuracy:
                 self.state = self.model.state_dict()
                 self.minloss = eloss
                 self.maxaccuracy = eacc
-                self.maxtestaccuracy = testacc
-                save_model = self.saved_path + "/" + self.task_name + "_%.2f_%.2f" % (self.maxaccuracy, self.maxtestaccuracy) + "@" + time.strftime("%H%M")
-                torch.save([self.state, self.minloss, self.maxaccuracy, self.maxtestaccuracy], 
+                save_model = self.saved_path + "/" + self.task_name + "_%.2f_%.2f" % (self.maxaccuracy, self.minloss) + "@" + time.strftime("%H%M")
+                torch.save([self.state, self.minloss, self.maxaccuracy], 
                            save_model)
                 
     def perepoch(self, ex, ey, e, istraining):
@@ -87,6 +86,8 @@ class Task:
         eavgloss = eloss / etotal if etotal != 0 else 1000.
         eaccuracy = ecorrect / etotal if etotal != 0 else 0.
         print("Epoch %d Loss: %f Accuracy: %f" % (e+1, eavgloss, eaccuracy))
+        for ecb in self.epoch_callback:
+            ecb.epoch_cb(self)
         return eavgloss, eaccuracy
     
     def __getattr__(self, name):

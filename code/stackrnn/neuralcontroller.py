@@ -26,16 +26,40 @@ class RNNController(nn.Module):
             gru_init_(self.rnn)
             if self.customalization:
                 apm = 5
-                self.fc_v2.weight.data.add_(torch.tensor([[0, 0, 0, 0, 0, 0, apm, 0],
-                                             [0, 0, 0, 0, 0, 0, 0, 0]], dtype=torch.float32))
-                self.fc_v1.weight.data.add_(torch.tensor([[0, 0, apm, 0, 0, 0, 0, 0],
-                                             [0, 0, 0, apm, 0, 0, 0, 0]], dtype=torch.float32))
-                self.fc_u.weight.data.add_(torch.tensor([0, 0, 0, 0, apm, apm, apm, apm],
-                                                         dtype=torch.float32))
-                self.fc_s1.weight.data.add_(torch.tensor([0, 0, 0, 0, apm, -apm, apm, -apm],
-                                                         dtype=torch.float32))
-                self.rnn.weight_ih.data.add_(torch.tensor([[0, 0, 0, 0, apm, 0],
-                                                           [0, 0, 0, 0, 0, apm]], dtype=torch.float32))
+                if self.data_name == 'anbn':
+                    self.fc_v2.weight.data.add_(torch.tensor([[0, 0, 0, 0, 0, 0, apm, 0],
+                                                 [0, 0, 0, 0, 0, 0, 0, 0]], dtype=torch.float32))
+                    self.fc_v1.weight.data.add_(torch.tensor([[0, 0, apm, 0, 0, 0, 0, 0],
+                                                 [0, 0, 0, apm, 0, 0, 0, 0]], dtype=torch.float32))
+                    self.fc_u.weight.data.add_(torch.tensor([0, 0, 0, 0, apm, apm, apm, apm],
+                                                             dtype=torch.float32))
+                    self.fc_s1.weight.data.add_(torch.tensor([0, 0, 0, 0, apm, -apm, apm, -apm],
+                                                             dtype=torch.float32))
+                    self.rnn.weight_ih.data.add_(torch.tensor([[0, 0, 0, 0, apm, 0],
+                                                               [0, 0, 0, 0, 0, apm]], dtype=torch.float32))
+                elif self.data_name == 'dyck1':
+                    self.fc_v2.weight.data.add_(torch.tensor([[0, 0, 0, 0, 0, 0, apm, 0],
+                                                 [0, 0, 0, 0, 0, 0, 0, 0]], dtype=torch.float32))
+                    self.fc_v1.weight.data.add_(torch.tensor([[0, 0, apm, 0, 0, 0, 0, 0],
+                                                 [0, 0, 0, apm, 0, 0, 0, 0]], dtype=torch.float32))
+                    self.fc_u.weight.data.add_(torch.tensor([0, 0, 0, 0, apm, apm, apm, apm],
+                                                             dtype=torch.float32))
+                    self.fc_s1.weight.data.add_(torch.tensor([0, 0, 0, 0, apm, -apm, apm, -apm],
+                                                             dtype=torch.float32))
+                    self.rnn.weight_ih.data.add_(torch.tensor([[0, 0, 0, 0, apm, 0],
+                                                               [0, 0, 0, 0, 0, 0]], dtype=torch.float32))
+                elif self.data_name == 'dyck2':
+                    self.fc_v2.weight.data.add_(torch.tensor([[0, 0, 0, 0, 0, 0, apm, 0, 0, 0],
+                                                              [0, 0, 0, 0, 0, 0, 0, 0, apm, 0]], dtype=torch.float32))
+                    self.fc_v1.weight.data.add_(torch.tensor([[0, 0, apm, 0, 0, 0, 0, 0, 0, 0],
+                                                              [0, 0, 0, apm, 0, 0, 0, 0, 0, 0]], dtype=torch.float32))
+                    self.fc_u.weight.data.add_(torch.tensor([0, 0, 0, 0, apm, apm, apm, apm, apm, apm],
+                                                             dtype=torch.float32))
+                    self.fc_s1.weight.data.add_(torch.tensor([0, 0, 0, 0, apm, -apm, apm, -apm, apm, -apm],
+                                                             dtype=torch.float32))
+                    self.rnn.weight_ih.data.add_(torch.tensor([[0, 0, 0, 0, 0, 0, 0, 0],
+                                                               [0, 0, 0, 0, 0, 0, 0, 0]], dtype=torch.float32))
+                    
     def __getattr__(self, name):
         if name in self.params:
             return self.params[name]

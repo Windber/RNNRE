@@ -5,16 +5,23 @@ from basicrnn.rnntask import RNNTask, RNN
 from stackrnn.nlfunction import *
 from stackrnn.stackrnncell import StackRNNCell
 from stackrnn.callback import Save_data
+
+def append(ori, des):
+    key = des.keys()
+    for k in ori.keys():
+        if k not in key:
+            des[k] = ori[k]
 basic = {
-    "batch_size": 100,
-    "epochs": 500,
-    "testfile_num": 5,
-    "lr": 1e-3,
+    "batch_size": 1,
+    "epochs": 50,
+    "testfile_num": 3,
+    "lr": 1e-2,
     "device": torch.device("cpu"),
     "verbose": False,
-    "debug": True,
+    "debug": False,
     "verbose_batch": 0,
     "initialization": True,
+    'validate': False,
     }
 
 rnn = {
@@ -311,21 +318,28 @@ anbncn.update(countlanguage)
 
 dyck1 = {
     "input_size": 4,
-    "hidden_size": 3,
+    "hidden_size": 2,
     "output_size": 3,
     "alphabet": {"(": [2], ")": [3], "s": [0], "e": [1]},
     "classes": {"1": [1, 0, 0], "3": [1, 1, 0], "6": [0, 1, 1]},
+    'data_name': 'dyck1'
 }
 dyck1.update(countlanguage)
+
+cfl = {
+    "train_path": r"../data_predicttask/cfl",
+    "test_path": r"../data_predicttask/cfl",
+    }
 
 dyck2 = {
     "input_size": 6,
     "hidden_size": 2,
     "output_size": 5,
-    "alphabet": {"(": [2], ")": [3], "s": [0], "e": [1], '[': 4, ']': 5},
-    "classes": {"1": [1, 0, 0, 0, 0], "b": [1, 1, 0, 1, 0], "e": [0, 1, 1, 1, 0], '1a': [0, 1, 0, 1, 1]}
+    "alphabet": {"(": [2], ")": [3], "s": [0], "e": [1], '[': [4], ']': [5]},
+    "classes": {"1": [1, 0, 0, 0, 0], "b": [1, 1, 0, 1, 0], "e": [0, 1, 1, 1, 0], '1a': [0, 1, 0, 1, 1]},
+    'data_name': 'dyck2'
 }
-dyck1.update(countlanguage)
+dyck2.update(cfl)
 
 
 anbncngruconfig = {
@@ -337,9 +351,8 @@ anbncngruconfig.update(basic)
 anbncngruconfig.update(gru)
 anbncngruconfig.update(anbncn)
 
-sd = Save_data(file_name="stackrnn/sdata/hotmap")
 stackrnn = {
-    "model_name": "Stack",
+    "model_name": "stacksrn",
     "task_class": StackRNNTask,
     "model_class": StackRNN,
     'cell_class': StackRNNCell,
@@ -348,20 +361,13 @@ stackrnn = {
     "n_args": 2,
     "load_path": r"stackrnn/smodel",
     "saved_path": r"stackrnn/smodel",
-    "sigmoid_type": HardSigmoid,
-    "class_weight": [0.5, 0.5],
-    "loss_num": 2,
-    "loss_weight": [0.01],
-    "linear_layers": [8],
-    "batch_callback": [],
-    "step_callback":[]
 }
 anbnstacksrnConfig = {
     "hidden_size": 2,
     "task_name": "anbn@stacksrn",     
-    "load_model": r'anbn@stacksrn_1.00_1.00@1702',
+    "load_model": r'anbn@stacksrn_1.00_1.00@honey',
     "load": True,
-    "onlytest": True,
+    "onlytest": False,
     "alpha": 1/32,
     "customalization": True,
     'weight_decay': 0,
@@ -370,8 +376,39 @@ anbnstacksrnConfig.update(basic)
 anbnstacksrnConfig.update(anbn)
 anbnstacksrnConfig.update(stackrnn)
 
+dyck1stacksrnConfig = {
+    "task_name": "dyck1@stacksrn",     
+    "load_model": r'dyck1@stacksrn_0.90_0.26@2222',
+    "load": False,
+    "onlytest": False,
+    "alpha": 1/32,
+    "customalization": True,
+    'weight_decay': 0,
+            }
+dyck1stacksrnConfig.update(basic)
+dyck1stacksrnConfig.update(dyck1)
+dyck1stacksrnConfig.update(stackrnn)
+
+sd = Save_data(path="stackrnn/sdata/")
+dyck2stacksrnConfig = {
+    "task_name": "dyck2@stacksrn",     
+    "load_model": r'dyck2@stacksrn_1.00_0.00@2355',
+    "load": True,
+    "onlytest": True,
+    "alpha": 1/32,
+    "customalization": True,
+    'weight_decay': 0,
+    "epoch_callback": [sd],
+    "batch_callback": [sd],
+    "step_callback":[sd],
+    
+            }
+dyck2stacksrnConfig.update(basic)
+dyck2stacksrnConfig.update(dyck2)
+dyck2stacksrnConfig.update(stackrnn)
+
 if __name__ == "__main__":
-    config_dict = anbnstacksrnConfig
+    config_dict = dyck2stacksrnConfig
     task = config_dict["task_class"](config_dict)
     task.experiment()
     
