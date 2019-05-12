@@ -12,9 +12,9 @@ def append(ori, des):
         if k not in key:
             des[k] = ori[k]
 basic = {
-    "batch_size": 1,
+    "batch_size": 100,
     "epochs": 50,
-    "testfile_num": 3,
+    "testfile_num": 1,
     "lr": 1e-2,
     "device": torch.device("cpu"),
     "verbose": False,

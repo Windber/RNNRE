@@ -23,12 +23,15 @@ class StackRNNCell(nn.Module):
 
     def forward(self, inp, h, r):
         
-        hidden, self._v1, self._v2, self._s1, self._u= self.controller(inp, h, r)
+        hidden, self._v1, self._v2, self._s1, self._u= \
+        self.controller(inp, h, r)
         
         self._s2 = self._s1.clone()
         
-        read = self.stack(self._u, self._s1, self._s2, self._v1, self._v2)
-
+        read = self.stack(self._u, 
+                          self._s1, self._s2, 
+                          self._v1, self._v2)
+    
         return hidden, read
     def __getattr__(self, name):
         if name in self.params:

@@ -22,19 +22,36 @@ class NeuralMemory(nn.Module):
         self._S.append(strength2)
         
     def read(self, u):
-        summary = torch.zeros([self.batch_size, self.read_size]).to(self.device)
-        strength_used = torch.zeros(self.batch_size, 1).to(self.device)
+        summary = torch.zeros(
+            [self.batch_size, self.read_size]
+            ).to(self.device)
+        strength_used = torch.zeros(
+            self.batch_size, 1).to(self.device)
         for i in self._read_indices():
-            summary = summary + self._values[i] * torch.min(self._S[i], torch.max(u - strength_used, torch.zeros(self.batch_size, 1)))
+            summary = summary + \
+            self._values[i] * \
+            torch.min(
+                self._S[i], torch.max(
+                    u - strength_used, 
+                    torch.zeros(self.batch_size, 1)))
             strength_used = strength_used + self._S[i]
         return summary
     
     def pop(self, u):
-        self._actual = torch.max(torch.zeros(self.batch_size, 1).to(self.device), self._actual - u)
-        strength_used = torch.zeros(self.batch_size, 1).to(self.device)
+        self._actual = torch.max(
+            torch.zeros(self.batch_size, 1).to(self.device), 
+            self._actual - u
+            )
+        strength_used = torch.zeros(
+            self.batch_size, 1
+            ).to(self.device)
         for i in self._pop_indices():
             tmp = self._S[i]
-            self._S[i] = self._S[i] - torch.min(self._S[i], torch.max(torch.zeros(self.batch_size, 1).to(self.device), u - strength_used))
+            self._S[i] = self._S[i] - \
+            torch.min(self._S[i], 
+                      torch.max(torch.zeros(
+                          self.batch_size, 1).to(self.device), 
+                                u - strength_used))
             strength_used = strength_used + tmp
     def __getattr__(self, name):
         if name in self.params:
