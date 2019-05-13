@@ -24,9 +24,10 @@ class Task:
         if self.load:
             if self.load_last:
                 load_last = pickle.load(open('finaltrain', 'rb'))
-                load_model = self.load_path + "/" + load_last
+                load_model = load_last
             else:
                 load_model = self.load_path + "/" + self.load_model
+            print(load_model)
             self.state, self.minloss, self.maxaccuracy = torch.load(load_model)
             self.model.load_state_dict(self.state)
         else:

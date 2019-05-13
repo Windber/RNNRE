@@ -392,9 +392,9 @@ append(dyck1stacksrnConfig, basic, dyck1, stackrnn)
 sd = Save_data(path="stackrnn/sdata/")
 dyck2stacksrnConfig = {
     "task_name": "dyck2@stacksrn",     
-    "load_model": r'dyck2@stacksrn_0.02_6.30@2113',
+    "load_model": r'dyck2@stacksrn_1.00_0.01@2216',
     "lr": 1e-3,
-    "load": True,
+    "load": False,
     "load_last": False,
     "onlytest": False,
     "alpha": 1/32,
