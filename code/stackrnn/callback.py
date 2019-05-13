@@ -17,7 +17,7 @@ class Save_data(Call_back):
     def __call__(self, model, *args):
         pass
     def epoch_cb(self, model, *args):
-        f = open(self.path + 'epoch' + str(self.epoch_count), 'wb')
+        f = open(self.path + 'only' + str(self.epoch_count), 'wb')
         pickle.dump(self.epoch, f)
         self.epoch = list()
         self.epoch_count += 1

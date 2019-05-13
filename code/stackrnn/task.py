@@ -10,6 +10,7 @@ import sys
 import pandas as pd
 import random
 import time
+import pickle
 class Task:
     def __init__(self, config_dict):
         self.params = config_dict
@@ -21,7 +22,11 @@ class Task:
         self.tepath_prefix = self.test_path + "/" + self.data_name + "_test"
         self.trainx, self.trainy, self.testxl, self.testyl = self.get_data()
         if self.load:
-            load_model = self.load_path + "/" + self.load_model
+            if self.load_last:
+                load_last = pickle.load(open('finaltrain', 'rb'))
+                load_model = self.load_path + "/" + load_last
+            else:
+                load_model = self.load_path + "/" + self.load_model
             self.state, self.minloss, self.maxaccuracy = torch.load(load_model)
             self.model.load_state_dict(self.state)
         else:
@@ -62,7 +67,10 @@ class Task:
                 save_model = self.saved_path + "/" + self.task_name + "_%.2f_%.2f" % (self.maxaccuracy, self.minloss) + "@" + time.strftime("%H%M")
                 torch.save([self.state, self.minloss, self.maxaccuracy], 
                            save_model)
-                
+        save_model = self.saved_path + "/" + self.task_name + "_%.2f_%.2f" % (self.maxaccuracy, self.minloss) + "@" + time.strftime("%H%M")
+        torch.save([self.state, self.minloss, self.maxaccuracy], 
+                   save_model)
+        pickle.dump(save_model, open('finaltrain', 'wb'))
     def perepoch(self, ex, ey, e, istraining):
         samples = ex.shape[0]
         bsize = self.batch_size

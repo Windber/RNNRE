@@ -47,7 +47,7 @@ class StackRNNTask(Task):
     def __init__(self, config_dict):
         super().__init__(config_dict)
         self.cel = nn.MSELoss(reduction="sum")
-        self.optim = RMSprop(self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
+        self.optim = RMSprop(self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay, momentum=0.9)
     def perbatch(self, xs, ys, bn, istraining):
         batch_loss = 0
         total = 0

@@ -6,16 +6,17 @@ from stackrnn.nlfunction import *
 from stackrnn.stackrnncell import StackRNNCell
 from stackrnn.callback import Save_data
 
-def append(ori, des):
-    key = des.keys()
-    for k in ori.keys():
-        if k not in key:
-            des[k] = ori[k]
+def append(ori, *dess):
+    key = ori.keys()
+    for des in dess:
+        for k in des.keys():
+            if k not in key:
+                ori[k] = des[k]
 basic = {
     "batch_size": 100,
     "epochs": 50,
-    "testfile_num": 1,
-    "lr": 1e-2,
+    "testfile_num": 5,
+    "lr": 1e-4,
     "device": torch.device("cpu"),
     "verbose": False,
     "debug": False,
@@ -385,27 +386,28 @@ dyck1stacksrnConfig = {
     "customalization": True,
     'weight_decay': 0,
             }
-dyck1stacksrnConfig.update(basic)
-dyck1stacksrnConfig.update(dyck1)
-dyck1stacksrnConfig.update(stackrnn)
+append(dyck1stacksrnConfig, basic, dyck1, stackrnn)
+
 
 sd = Save_data(path="stackrnn/sdata/")
 dyck2stacksrnConfig = {
     "task_name": "dyck2@stacksrn",     
-    "load_model": r'dyck2@stacksrn_1.00_0.00@2355',
+    "load_model": r'dyck2@stacksrn_0.02_6.30@2113',
+    "lr": 1e-3,
     "load": True,
-    "onlytest": True,
+    "load_last": False,
+    "onlytest": False,
     "alpha": 1/32,
-    "customalization": True,
+    "customalization": False,
+    "epochs": 10,
+    "testfile_num": 1,
     'weight_decay': 0,
-    "epoch_callback": [sd],
-    "batch_callback": [sd],
-    "step_callback":[sd],
+    "epoch_callback": [],
+    "batch_callback": [],
+    "step_callback":[],
     
             }
-dyck2stacksrnConfig.update(basic)
-dyck2stacksrnConfig.update(dyck2)
-dyck2stacksrnConfig.update(stackrnn)
+append(dyck2stacksrnConfig, basic, dyck2, stackrnn)
 
 if __name__ == "__main__":
     config_dict = dyck2stacksrnConfig
