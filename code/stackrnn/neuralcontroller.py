@@ -1,7 +1,7 @@
 import torch.nn as nn
 import numpy as np
 import torch
-from stackrnn.initialization import gru_init_, linear_init_
+from stackrnn.initialization import rnn_init_, linear_init_
 class RNNController(nn.Module):
     def __init__(self, config_dict):
         
@@ -23,7 +23,7 @@ class RNNController(nn.Module):
             linear_init_(self.fc_v1)
             linear_init_(self.fc_s1)
             linear_init_(self.fc_u)
-            gru_init_(self.rnn)
+            rnn_init_(self.rnn)
             self.fc_u.bias.data.add_(torch.tensor(-1, dtype=torch.float32))
             self.fc_s1.bias.data.add_(torch.tensor(1, dtype=torch.float32))
             if self.customalization:

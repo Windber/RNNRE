@@ -4,7 +4,7 @@ from stackrnn.stackrnntask import StackRNNTask, StackRNN
 from stackrnn.rnntask import RNNTask, RNN
 from stackrnn.nlfunction import *
 from stackrnn.stackrnncell import StackRNNCell
-from stackrnn.callback import Save_data
+from stackrnn.callback import Save_data, Sdforlstm
 
 def append(ori, *dess):
     key = ori.keys()
@@ -12,7 +12,9 @@ def append(ori, *dess):
         for k in des.keys():
             if k not in key:
                 ori[k] = des[k]
-sd = Save_data(path="stackrnn/sdata/")
+# sd = Sdforlstm(path="stackrnn/sdata/", task='t6@lstm')
+# sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
+# sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 basic = {
     "batch_size": 100,
     "epochs": 50,
@@ -27,6 +29,9 @@ basic = {
     "load_path": r"stackrnn/smodel/",
     "saved_path": r"stackrnn/smodel/",
     'load_last': True,
+    'epoch_callback': [],
+    'batch_callback': [],
+    'step_callback': [],
     }
 
 rnn = {
@@ -95,7 +100,9 @@ tomita = {
     "hidden_size": 2,
     "output_size": 3,
     "alphabet": {"0": [0], "1": [1], "s": [2], "e": [3]},
-    "classes": {'1': [1, 0, 0], '5': [1, 0, 1], '7': [1, 1, 1]},
+    "classes": {'1': [1, 0, 0], '2': [0, 1, 0], '3': [1, 1, 0], '4': [0, 0, 1], '5': [1, 0, 1], '6': [0, 1, 1], '7': [1, 1, 1]},
+    "train_path": r"../data_predicttask/tomita/",
+    "test_path": r"../data_predicttask/tomita/",
     }
 
 t1 = {
@@ -311,6 +318,7 @@ append(t6gruConfig, basic, t6, gru)
 t6lstmConfig = {
     "task_name": "t6@LSTM",
     "load": False,
+    'onlytest': True,
     "load_model": r"t6@LSTM_0.03_0.01@1322",
             }
 append(t6lstmConfig, basic, t6, lstm)
@@ -459,6 +467,7 @@ dyck2stacksrnConfig = {
     "load": True,
     'testfile_num': 1,
     'epochs': 50,
+    'alpha': 0.002,
             }
 
 dyck2stackgruConfig = {

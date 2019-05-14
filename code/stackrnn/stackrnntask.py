@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.optim import RMSprop
 from stackrnn.task import Task
-from stackrnn.initialization import gru_init_, linear_init_
+from stackrnn.initialization import rnn_init_, linear_init_
 class StackRNN(nn.Module):
     def __init__(self, config_dict):
         super().__init__()

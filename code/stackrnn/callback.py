@@ -13,26 +13,71 @@ class Save_data(Call_back):
         super().__init__(kwargs)
         self.epoch = list()
         self.batch = list()
-        self.epoch_count = 0
+        self.epoch_count = 1
     def __call__(self, model, *args):
         pass
     def epoch_cb(self, model, *args):
-        f = open(self.path + 'only' + str(self.epoch_count), 'wb')
+        f = open(self.path + self.task + '_test' + str(self.epoch_count), 'wb')
         pickle.dump(self.epoch, f)
         self.epoch = list()
         self.epoch_count += 1
         
+class Sdforlstm(Save_data):
+    def batch_cb(self, model, *args):
+        arr = np.array(self.batch)
+        arr = np.transpose(arr, (1, 0, 2))
+        self.epoch.append(arr)
+        self.batch = list()
+
+    def step_cb(self, model, *args):
+        h = args[0][0].detach().numpy()
+        c = args[0][1].detach().numpy()
+        batch_size = model.batch_size
+        element_size = 0
+        li = [h, c]
+        for i in li:
+            tmp = i.shape[1] if len(i.shape) > 1 else 1
+            element_size += tmp
+        arr = np.ndarray((batch_size, element_size))
+        index = 0
+        for i in li:
+            tmp = i.shape[1] if len(i.shape) > 1 else 1
+            arr[:, index: index + tmp] = i
+            index += tmp
+        self.batch.append(arr)
+
+class Sdforsrn(Save_data):
+    def batch_cb(self, model, *args):
+        arr = np.array(self.batch)
+        arr = np.transpose(arr, (1, 0, 2))
+        self.epoch.append(arr)
+        self.batch = list()
+
+    def step_cb(self, model, *args):
+        h = args[0].detach().numpy()
+        batch_size = model.batch_size
+        element_size = 0
+        li = [h]
+        for i in li:
+            tmp = i.shape[1] if len(i.shape) > 1 else 1
+            element_size += tmp
+        arr = np.ndarray((batch_size, element_size))
+        index = 0
+        for i in li:
+            tmp = i.shape[1] if len(i.shape) > 1 else 1
+            arr[:, index: index + tmp] = i
+            index += tmp
+        self.batch.append(arr)
+class Sdforstacksrn(Save_data):
     def batch_cb(self, model, *args):
         arr = np.array(self.batch)
         arr = np.transpose(arr, (1, 0, 2))
         y = args[0].detach().numpy()
         arr = np.concatenate([arr, y], axis=2)
         self.epoch.append(arr)
-        # y = args[1].detach().numpy().reshape(-1, 1)
         self.batch = list()
-        
+
     def step_cb(self, model, *args):
-        # scb.step_cb(self.model, bx[:, i, :], by[:, i], yp[:, i, :])
         x = args[0].detach().numpy()
         yp = args[1].detach().numpy()
         read = args[2].detach().numpy()
