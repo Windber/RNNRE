@@ -4,7 +4,7 @@ from stackrnn.stackrnntask import StackRNNTask, StackRNN
 from stackrnn.rnntask import RNNTask, RNN
 from stackrnn.nlfunction import *
 from stackrnn.stackrnncell import StackRNNCell
-from stackrnn.callback import Save_data, Sdforlstm, Sdforstacksrn
+from stackrnn.callback import Save_data, Sdforlstm, Save_loss
 
 def append(ori, *dess):
     key = ori.keys()
@@ -12,12 +12,16 @@ def append(ori, *dess):
         for k in des.keys():
             if k not in key:
                 ori[k] = des[k]
+                
+sd = None
 # sd = Sdforlstm(path="stackrnn/sdata/", task='t6@lstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
-sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
+# sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
+sd = Save_loss(path='stackrnn/sdata/', task='t1@srn')
+sdl = sd if sd is not None else []
 basic = {
     "batch_size": 100,
-    "epochs": 50,
+    "epochs": 100,
     "testfile_num": 5,
     "lr": 1e-4,
     "device": torch.device("cpu"),
@@ -28,12 +32,9 @@ basic = {
     'validate': False,
     "load_path": r"stackrnn/smodel/",
     "saved_path": r"stackrnn/smodel/",
-    'load_last': False,
-    'epoch_callback': [sd],
-    'batch_callback': [sd],
-    'step_callback': [sd],
-    'load': True,
-    'onlytest': True,
+    'onlytest': False,
+    'load_last': True,
+    'callback': sdl,
     }
 
 rnn = {
@@ -70,10 +71,12 @@ stackrnn = {
     "testfile_num": 1,
     "onlytest": False,
     "alpha": 0,
-    "customalization": True,
+    "customalization": False,
+    "epoch_callback": [],
+    "batch_callback": [],
+    "step_callback":[],
     "epochs": 10,
     'weight_decay': 0,
-    
 }
 
 stacksrn = {
@@ -199,7 +202,7 @@ t1gruConfig = {
     "load_model": r"t1@GRU_0.03_0.01@1322",
             }
 
-append(t1srnConfig, basic, t1, gru)
+append(t1gruConfig, basic, t1, gru)
 
 t1lstmConfig = {
     "task_name": "t1@LSTM",
@@ -207,7 +210,7 @@ t1lstmConfig = {
     "load_model": r"t1@LSTM_0.03_0.01@1322",
             }
 
-append(t1srnConfig, basic, t1, lstm)
+append(t1lstmConfig, basic, t1, lstm)
 
 t2srnConfig = {
     "task_name": "t2@srn",
@@ -463,8 +466,9 @@ append(t4stackgruConfig, basic, t4, stackgru)
 
 dyck2stacksrnConfig = {
     "task_name": "dyck2@stacksrn",     
-    "load_model": r'dyck2@stacksrn_0.98_0.04@2327',
-    'testfile_num': 5,
+    "load_model": r'dyck2@stacksrn_1.00_0.01@2216',
+    "load": True,
+    'testfile_num': 1,
     'epochs': 50,
     'alpha': 0.002,
             }
@@ -486,7 +490,12 @@ append(dyck2stackgruConfig, basic, dyck2, stackgru)
 append(dyck2stacklstmConfig, basic, dyck2, stacklstm)
 
 if __name__ == "__main__":
-    config_dict = dyck2stacksrnConfig
-    task = config_dict["task_class"](config_dict)
-    task.experiment()
+    for t in ['t1', 't2', 't3', 't4', 't5', 't6', 't7']:
+        for r in ['srn', 'gru', 'lstm']:
     
+            config_dict = eval(t + r + 'Config')
+            sd = Save_loss(path='stackrnn/sdata/', task=t+r)
+            config_dict['callback'] = [sd]
+            task = config_dict["task_class"](config_dict)
+            task.experiment()
+            

@@ -8,6 +8,25 @@ class Call_back:
             return self.params[name]
         else:
             return super().__getattr__(name)
+        
+    def step_cb(self, model, *args):
+        pass
+    def batch_cb(self, model, *args):
+        pass
+    def epoch_cb(self, model, *args):
+        pass
+    def eepoch_cb(self, model, *args):
+        pass
+class Save_loss(Call_back):
+    def __init__(self, **kwargs):
+        self.params = kwargs
+        self.eepoch = list()
+    def eepoch_cb(self, model, *args):
+        f = open(self.path + self.task + '_loss', 'wb')
+        pickle.dump(self.eepoch, f)
+        f.close()
+    def epoch_cb(self, model, *args):
+        self.eepoch.append(args[0])
 class Save_data(Call_back):
     def __init__(self, **kwargs):
         super().__init__(kwargs)
