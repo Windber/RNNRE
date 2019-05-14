@@ -72,6 +72,8 @@ class Task:
         torch.save([self.state, self.minloss, self.maxaccuracy], 
                    save_model)
         pickle.dump(save_model, open('finaltrain', 'wb'))
+        for eecb in self.callback:
+            eecb.eepoch_cb(self)
     def perepoch(self, ex, ey, e, istraining):
         samples = ex.shape[0]
         bsize = self.batch_size
@@ -95,8 +97,8 @@ class Task:
         eavgloss = eloss / etotal if etotal != 0 else 1000.
         eaccuracy = ecorrect / etotal if etotal != 0 else 0.
         print("Epoch %d Loss: %f Accuracy: %f" % (e+1, eavgloss, eaccuracy))
-        for ecb in self.epoch_callback:
-            ecb.epoch_cb(self)
+        for ecb in self.callback:
+            ecb.epoch_cb(self, eavgloss)
         return eavgloss, eaccuracy
     
     def __getattr__(self, name):

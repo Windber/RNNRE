@@ -43,7 +43,7 @@ class RNN(nn.Module):
                 self.hidden = self.cell(x[:, i, :], self.hidden)
                 tmp = self.hidden
             output = self.nonlinear(self.linear(tmp))
-            for scb in self.step_callback:
+            for scb in self.callback:
                 scb.step_cb(self, self.hidden)
             outputs.append(torch.unsqueeze(output, 1))
         outputs = torch.cat(outputs, 1)
@@ -89,7 +89,7 @@ class RNNTask(Task):
             self.optim.step()
         if self.verbose:
             print("Train batch %d Loss: %f Accuracy: %f" % (bn, batch_loss / total, correct / total))
-        for bcb in self.batch_callback:
+        for bcb in self.callback:
             bcb.batch_cb(self.model)
         return batch_loss.item(), correct, total
 

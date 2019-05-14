@@ -4,7 +4,7 @@ from stackrnn.stackrnntask import StackRNNTask, StackRNN
 from stackrnn.rnntask import RNNTask, RNN
 from stackrnn.nlfunction import *
 from stackrnn.stackrnncell import StackRNNCell
-from stackrnn.callback import Save_data, Sdforlstm
+from stackrnn.callback import Save_data, Sdforlstm, Save_loss
 
 def append(ori, *dess):
     key = ori.keys()
@@ -12,26 +12,29 @@ def append(ori, *dess):
         for k in des.keys():
             if k not in key:
                 ori[k] = des[k]
+                
+sd = None
 # sd = Sdforlstm(path="stackrnn/sdata/", task='t6@lstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
+sd = Save_loss(path='stackrnn/sdata/', task='t1@srn')
+sdl = sd if sd is not None else []
 basic = {
     "batch_size": 100,
-    "epochs": 50,
-    "testfile_num": 5,
+    "epochs": 5,
+    "testfile_num": 1,
     "lr": 1e-4,
     "device": torch.device("cpu"),
     "verbose": False,
-    "debug": False,
+    "debug": True,
     "verbose_batch": 0,
     "initialization": True,
     'validate': False,
     "load_path": r"stackrnn/smodel/",
     "saved_path": r"stackrnn/smodel/",
+    'onlytest': False,
     'load_last': True,
-    'epoch_callback': [],
-    'batch_callback': [],
-    'step_callback': [],
+    'callback': sdl,
     }
 
 rnn = {
@@ -199,7 +202,7 @@ t1gruConfig = {
     "load_model": r"t1@GRU_0.03_0.01@1322",
             }
 
-append(t1srnConfig, basic, t1, gru)
+append(t1gruConfig, basic, t1, gru)
 
 t1lstmConfig = {
     "task_name": "t1@LSTM",
@@ -207,7 +210,7 @@ t1lstmConfig = {
     "load_model": r"t1@LSTM_0.03_0.01@1322",
             }
 
-append(t1srnConfig, basic, t1, lstm)
+append(t1lstmConfig, basic, t1, lstm)
 
 t2srnConfig = {
     "task_name": "t2@srn",
@@ -487,7 +490,12 @@ append(dyck2stackgruConfig, basic, dyck2, stackgru)
 append(dyck2stacklstmConfig, basic, dyck2, stacklstm)
 
 if __name__ == "__main__":
-    config_dict = dyck2stacksrnConfig
-    task = config_dict["task_class"](config_dict)
-    task.experiment()
+    for t in ['t1', 't2', 't3', 't4', 't5', 't6', 't7']:
+        for r in ['srn', 'gru', 'lstm']:
     
+            config_dict = eval(t + r + 'Config')
+            sd = Save_loss(path='stackrnn/sdata/', task=t+r)
+            config_dict['callback'] = [sd]
+            task = config_dict["task_class"](config_dict)
+            task.experiment()
+            
