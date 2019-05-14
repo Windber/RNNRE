@@ -464,7 +464,7 @@ append(t4stackgruConfig, basic, t4, stackgru)
 dyck2stacksrnConfig = {
     "task_name": "dyck2@stacksrn",     
     "load_model": r'dyck2@stacksrn_1.00_0.01@2216',
-    "load": True,
+    "load": False,
     'testfile_num': 1,
     'epochs': 50,
     'alpha': 0.002,

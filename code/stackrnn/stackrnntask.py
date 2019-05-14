@@ -8,7 +8,7 @@ class StackRNN(nn.Module):
         super().__init__()
         self.params = config_dict
         self.cell = self.cell_class(config_dict).to(self.device)
-        self.o_linear = nn.Linear(self.hidden_size, self.output_size).to(self.device)
+        self.o_linear = nn.Linear(self.hidden_size+self.read_size+1, self.output_size).to(self.device)
         self.nl = nn.Sigmoid()
         
         self.read = None
@@ -21,7 +21,7 @@ class StackRNN(nn.Module):
         outputs = list()
         for i in range(steps):
             self.hidden, self.read = self.cell(x[:, i, :], self.hidden, self.read)
-            output = self.nl(self.o_linear(self.hidden))
+            output = self.nl(self.o_linear(torch.cat([self.hidden, self.read, self.cell.stack._actual], 1)))
             outputs.append(torch.unsqueeze(output, 1))
             for scb in self.step_callback:
                 scb.step_cb(self.cell, x[:, i, :], output, self.read, self.hidden)
