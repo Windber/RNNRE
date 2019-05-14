@@ -10,7 +10,7 @@ class RNNController(nn.Module):
         ir_size = self.input_size + self.read_size
         qir_size = self.hidden_size + ir_size
         self.rnn = self.controller_cell_class(ir_size, self.hidden_size).to(self.device)
-        self.fc_s1 = nn.Linear(qir_size, 1).to(self.device)
+        self.fc_s1 = nn.Linear(qir_size, 2).to(self.device)
         self.fc_u = nn.Linear(qir_size, 1).to(self.device)
         self.fc_v1 = nn.Linear(qir_size, self.read_size).to(self.device)
         self.fc_v2 = nn.Linear(qir_size, self.read_size).to(self.device)
@@ -25,6 +25,7 @@ class RNNController(nn.Module):
             linear_init_(self.fc_u)
             gru_init_(self.rnn)
             self.fc_u.bias.data.add_(torch.tensor(-1, dtype=torch.float32))
+            self.fc_s1.bias.data.add_(torch.tensor([1, 1], dtype=torch.float32))
             if self.customalization:
                 apm = 5
                 if self.data_name == 'anbn':
@@ -70,12 +71,12 @@ class RNNController(nn.Module):
         ri = torch.cat([r, x], dim=1)
         qri = torch.cat([h, ri], dim=1)
         
-        s1 = self.sigmoid(self.fc_s1(qri))
+        s = self.sigmoid(self.fc_s1(qri))
         u = self.sigmoid(self.fc_u(qri))
         v1 = self.tanh(self.fc_v1(qri))
         v2 = self.tanh(self.fc_v2(qri))
         hidden = self.rnn(ri, h)
-        
-        return hidden, v1, v2, s1, u
+        s1, s2 = torch.split(s, 1, 1)
+        return hidden, v1, v2, s1, s2, u
 
     

@@ -399,7 +399,7 @@ dyck2stacksrnConfig = {
     "onlytest": False,
     "alpha": 1/32,
     "customalization": False,
-    "epochs": 10,
+    "epochs": 50,
     "testfile_num": 1,
     'weight_decay': 0,
     "epoch_callback": [],
