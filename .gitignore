@@ -1,2 +1,2 @@
-*/smodel/*
-*.pyc
+code/stackrnn/smodel/
+code/stackrnn/sdata/

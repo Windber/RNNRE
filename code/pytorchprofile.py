@@ -21,12 +21,12 @@ sd = Save_loss(path='stackrnn/sdata/', task='t1@srn')
 sdl = sd if sd is not None else []
 basic = {
     "batch_size": 100,
-    "epochs": 5,
-    "testfile_num": 1,
+    "epochs": 100,
+    "testfile_num": 5,
     "lr": 1e-4,
     "device": torch.device("cpu"),
     "verbose": False,
-    "debug": True,
+    "debug": False,
     "verbose_batch": 0,
     "initialization": True,
     'validate': False,
