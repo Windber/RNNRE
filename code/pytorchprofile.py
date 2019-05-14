@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from stackrnn.stackrnntask import StackRNNTask, StackRNN
-from basicrnn.rnntask import RNNTask, RNN
+from stackrnn.rnntask import RNNTask, RNN
 from stackrnn.nlfunction import *
 from stackrnn.stackrnncell import StackRNNCell
 from stackrnn.callback import Save_data
@@ -12,6 +12,7 @@ def append(ori, *dess):
         for k in des.keys():
             if k not in key:
                 ori[k] = des[k]
+sd = Save_data(path="stackrnn/sdata/")
 basic = {
     "batch_size": 100,
     "epochs": 50,
@@ -23,30 +24,23 @@ basic = {
     "verbose_batch": 0,
     "initialization": True,
     'validate': False,
+    "load_path": r"stackrnn/smodel/",
+    "saved_path": r"stackrnn/smodel/",
+    'load_last': True,
     }
 
 rnn = {
-    "load_path": r"basicrnn/smodel",
-    "saved_path": r"basicrnn/smodel",
    "task_class": RNNTask,
     "model_class": RNN,
     }
 
 gru = {
     "model_name": "GRU",
-    "load_path": r"basicrnn/smodel",
-    "saved_path": r"basicrnn/smodel",
-   "task_class": RNNTask,
-    "model_class": RNN,
     "cell_class": nn.GRUCell,
     }
 
 lstm = {
     "model_name": "LSTM",
-    "load_path": r"basicrnn/smodel",
-    "saved_path": r"basicrnn/smodel",
-   "task_class": RNNTask,
-    "model_class": RNN,
     "cell_class": nn.LSTMCell,
     }
 
@@ -55,21 +49,53 @@ srn = {
     "cell_class": nn.RNNCell,
     }
 
+append(srn, rnn)
+append(gru, rnn)
+append(lstm, rnn)
 
+stackrnn = {
+    "task_class": StackRNNTask,
+    "model_class": StackRNN,
+    'cell_class': StackRNNCell,
+    "read_size": 2,
+    "n_args": 2,
+    "lr": 1e-3,
+    "testfile_num": 1,
+    "onlytest": False,
+    "alpha": 0,
+    "customalization": False,
+    "epoch_callback": [],
+    "batch_callback": [],
+    "step_callback":[],
+    "epochs": 10,
+    'weight_decay': 0,
+}
 
-srn.update(rnn)
-lstm.update(rnn)
-gru.update(rnn)
+stacksrn = {
+    "model_name": "stacksrn",
+    'controller_cell_class': nn.RNNCell,
+    }
+
+stackgru = {
+    "model_name": "stackgru",
+    'controller_cell_class': nn.GRUCell,
+    }
+
+stacklstm = {
+    "model_name": "stacklstm",
+    'controller_cell_class': nn.LSTMCell,
+    }
+
+append(stacksrn, stackrnn)
+append(stackgru, stackrnn)
+append(stacklstm, stackrnn)
+
 tomita = {
     "input_size": 4,
     "hidden_size": 2,
     "output_size": 3,
     "alphabet": {"0": [0], "1": [1], "s": [2], "e": [3]},
     "classes": {'1': [1, 0, 0], '5': [1, 0, 1], '7': [1, 1, 1]},
-    "train_path": r"../data_predicttask/tomita",
-    "test_path": r"../data_predicttask/tomita",
-    "load_path": r"basicrnn/smodel",
-    "saved_path": r"basicrnn/smodel"
     }
 
 t1 = {
@@ -93,209 +119,20 @@ t6 = {
 t7 = {
     "data_name": "t7",
     }
-t1.update(tomita)
-t2.update(tomita)
-t3.update(tomita)
-t4.update(tomita)
-t5.update(tomita)
-t6.update(tomita)
-t7.update(tomita)
 
-t1srnConfig = {
-    "task_name": "t1@srn",
-    "load": False,
-    "load_model": r"t1@srn_0.03_0.01@1322",
-            }
-t1srnConfig.update(basic)
-t1srnConfig.update(t1)
-t1srnConfig.update(srn)
+append(t1, tomita)
+append(t2, tomita)
+append(t3, tomita)
+append(t4, tomita)
+append(t5, tomita)
+append(t6, tomita)
+append(t7, tomita)
 
-t1gruConfig = {
-    "task_name": "t1@GRU",
-    "load": False,
-    "load_model": r"t1@GRU_0.03_0.01@1322",
-            }
-t1gruConfig.update(basic)
-t1gruConfig.update(t1)
-t1gruConfig.update(gru)
-
-t1lstmConfig = {
-    "task_name": "t1@LSTM",
-    "load": False,
-    "load_model": r"t1@LSTM_0.03_0.01@1322",
-            }
-t1lstmConfig.update(basic)
-t1lstmConfig.update(t1)
-t1lstmConfig.update(lstm)
-
-t2srnConfig = {
-    "task_name": "t2@srn",
-    "load": False,
-    "load_model": r"t2@srn_0.03_0.01@1322",
-            }
-t2srnConfig.update(basic)
-t2srnConfig.update(t2)
-t2srnConfig.update(srn)
-
-t2gruConfig = {
-    "task_name": "t2@GRU",
-    "load": False,
-    "load_model": r"t2@GRU_0.03_0.01@1322",
-            }
-t2gruConfig.update(basic)
-t2gruConfig.update(t2)
-t2gruConfig.update(gru)
-
-t2lstmConfig = {
-    "task_name": "t2@LSTM",
-    "load": False,
-    "load_model": r"t2@LSTM_0.03_0.01@1322",
-            }
-t2lstmConfig.update(basic)
-t2lstmConfig.update(t2)
-t2lstmConfig.update(lstm)
-
-t3srnConfig = {
-    "task_name": "t3@srn",
-    "load": False,
-    "load_model": r"t3@srn_0.03_0.01@1322",
-            }
-t3srnConfig.update(basic)
-t3srnConfig.update(t3)
-t3srnConfig.update(srn)
-
-t3gruConfig = {
-    "task_name": "t3@GRU",
-    "load": False,
-    "load_model": r"t3@GRU_0.03_0.01@1322",
-            }
-t3gruConfig.update(basic)
-t3gruConfig.update(t3)
-t3gruConfig.update(gru)
-
-t3lstmConfig = {
-    "task_name": "t3@LSTM",
-    "load": False,
-    "load_model": r"t3@LSTM_0.03_0.01@1322",
-            }
-t3lstmConfig.update(basic)
-t3lstmConfig.update(t3)
-t3lstmConfig.update(lstm)
-
-
-t4srnConfig = {
-    "task_name": "t4@srn",
-    "load": False,
-    "load_model": r"t4@srn_0.03_0.01@1322",
-            }
-t4srnConfig.update(basic)
-t4srnConfig.update(t4)
-t4srnConfig.update(srn)
-
-t4gruConfig = {
-    "task_name": "t4@GRU",
-    "load": False,
-    "load_model": r"t4@GRU_0.03_0.01@1322",
-            }
-t4gruConfig.update(basic)
-t4gruConfig.update(t4)
-t4gruConfig.update(gru)
-
-t4lstmConfig = {
-    "task_name": "t4@LSTM",
-    "load": False,
-    "load_model": r"t4@LSTM_0.03_0.01@1322",
-            }
-t4lstmConfig.update(basic)
-t4lstmConfig.update(t4)
-t4lstmConfig.update(lstm)
-
-t5srnConfig = {
-    "task_name": "t5@srn",
-    "load": False,
-    "load_model": r"t5@srn_0.03_0.01@1322",
-            }
-t5srnConfig.update(basic)
-t5srnConfig.update(t5)
-t5srnConfig.update(srn)
-
-t5gruConfig = {
-    "task_name": "t5@GRU",
-    "load": False,
-    "load_model": r"t5@GRU_0.03_0.01@1322",
-            }
-t5gruConfig.update(basic)
-t5gruConfig.update(t5)
-t5gruConfig.update(gru)
-
-t5lstmConfig = {
-    "task_name": "t5@LSTM",
-    "load": False,
-    "load_model": r"t5@LSTM_0.03_0.01@1322",
-            }
-t5lstmConfig.update(basic)
-t5lstmConfig.update(t5)
-t5lstmConfig.update(lstm)
-
-t6srnConfig = {
-    "task_name": "t6@srn",
-    "load": False,
-    "load_model": r"t6@srn_0.03_0.01@1322",
-            }
-t6srnConfig.update(basic)
-t6srnConfig.update(t6)
-t6srnConfig.update(srn)
-
-t6gruConfig = {
-    "task_name": "t6@GRU",
-    "load": False,
-    "load_model": r"t6@GRU_0.03_0.01@1322",
-            }
-t6gruConfig.update(basic)
-t6gruConfig.update(t6)
-t6gruConfig.update(gru)
-
-t6lstmConfig = {
-    "task_name": "t6@LSTM",
-    "load": False,
-    "load_model": r"t6@LSTM_0.03_0.01@1322",
-            }
-t6lstmConfig.update(basic)
-t6lstmConfig.update(t6)
-t6lstmConfig.update(lstm)
-
-t7srnConfig = {
-    "task_name": "t7@srn",
-    "load": False,
-    "load_model": r"t7@srn_0.03_0.01@1322",
-            }
-t7srnConfig.update(basic)
-t7srnConfig.update(t7)
-t7srnConfig.update(srn)
-
-t7gruConfig = {
-    "task_name": "t7@GRU",
-    "load": False,
-    "load_model": r"t7@GRU_0.03_0.01@1322",
-            }
-t7gruConfig.update(basic)
-t7gruConfig.update(t7)
-t7gruConfig.update(gru)
-
-t7lstmConfig = {
-    "task_name": "t7@LSTM",
-    "load": False,
-    "load_model": r"t7@LSTM_0.03_0.01@1322",
-            }
-t7lstmConfig.update(basic)
-t7lstmConfig.update(t7)
-t7lstmConfig.update(lstm)
-
-
-countlanguage = {
-    "train_path": r"../data_predicttask/countlanguage",
-    "test_path": r"../data_predicttask/countlanguage",
+cl = {
+    "train_path": r"../data_predicttask/cl/",
+    "test_path": r"../data_predicttask/cl/",
     }
+
 anbn = {
     "alphabet": {"a": [2], "b": [3], "s": [0], "e": [1], "#": [1]},
     "classes": {"3": [1, 1, 0], "6": [0, 1, 1], "4": [0, 0, 1], "1": [1, 0, 0]},
@@ -304,8 +141,7 @@ anbn = {
     "output_size": 3,
     "data_name": "anbn",
     }
-
-anbn.update(countlanguage)
+append(anbn, cl)
 
 anbncn = {
     "input_size": 5,
@@ -315,7 +151,7 @@ anbncn = {
     "classes": {"1": [1, 0, 0, 0], "3": [1, 1, 0, 0], "4": [0, 0, 1, 0], "6": [0, 1, 1, 0], "8": [0, 0, 0, 1]},
     "data_name": "anbncn",
     }
-anbncn.update(countlanguage)
+append(anbncn, cl)
 
 dyck1 = {
     "input_size": 4,
@@ -325,11 +161,11 @@ dyck1 = {
     "classes": {"1": [1, 0, 0], "3": [1, 1, 0], "6": [0, 1, 1]},
     'data_name': 'dyck1'
 }
-dyck1.update(countlanguage)
+append(dyck1, cl)
 
 cfl = {
-    "train_path": r"../data_predicttask/cfl",
-    "test_path": r"../data_predicttask/cfl",
+    "train_path": r"../data_predicttask/cfl/",
+    "test_path": r"../data_predicttask/cfl/",
     }
 
 dyck2 = {
@@ -340,74 +176,306 @@ dyck2 = {
     "classes": {"1": [1, 0, 0, 0, 0], "b": [1, 1, 0, 1, 0], "e": [0, 1, 1, 1, 0], '1a': [0, 1, 0, 1, 1]},
     'data_name': 'dyck2'
 }
-dyck2.update(cfl)
+append(dyck2, cfl)
 
+t1srnConfig = {
+    "task_name": "t1@srn",
+    "load": False,
+    "load_model": r"t1@srn_0.03_0.01@1322",
+            }
 
-anbncngruconfig = {
-    "task_name": "anbncn@gru",
+append(t1srnConfig, basic, t1, srn)
+
+t1gruConfig = {
+    "task_name": "t1@GRU",
+    "load": False,
+    "load_model": r"t1@GRU_0.03_0.01@1322",
+            }
+
+append(t1srnConfig, basic, t1, gru)
+
+t1lstmConfig = {
+    "task_name": "t1@LSTM",
+    "load": False,
+    "load_model": r"t1@LSTM_0.03_0.01@1322",
+            }
+
+append(t1srnConfig, basic, t1, lstm)
+
+t2srnConfig = {
+    "task_name": "t2@srn",
+    "load": False,
+    "load_model": r"t2@srn_0.03_0.01@1322",
+            }
+
+append(t2srnConfig, basic, t2, srn)
+
+t2gruConfig = {
+    "task_name": "t2@GRU",
+    "load": False,
+    "load_model": r"t2@GRU_0.03_0.01@1322",
+            }
+
+append(t2gruConfig, basic, t2, gru)
+
+t2lstmConfig = {
+    "task_name": "t2@LSTM",
+    "load": False,
+    "load_model": r"t2@LSTM_0.03_0.01@1322",
+            }
+
+append(t2lstmConfig, basic, t2, lstm)
+
+t3srnConfig = {
+    "task_name": "t3@srn",
+    "load": False,
+    "load_model": r"t3@srn_0.03_0.01@1322",
+            }
+
+append(t3srnConfig, basic, t3, srn)
+
+t3gruConfig = {
+    "task_name": "t3@GRU",
+    "load": False,
+    "load_model": r"t3@GRU_0.03_0.01@1322",
+            }
+append(t3gruConfig, basic, t3, gru)
+
+t3lstmConfig = {
+    "task_name": "t3@LSTM",
+    "load": False,
+    "load_model": r"t3@LSTM_0.03_0.01@1322",
+            }
+
+append(t3lstmConfig, basic, t3, lstm)
+
+t4srnConfig = {
+    "task_name": "t4@srn",
+    "load": False,
+    "load_model": r"t4@srn_0.03_0.01@1322",
+            }
+
+append(t4srnConfig, basic, t4, srn)
+
+t4gruConfig = {
+    "task_name": "t4@GRU",
+    "load": False,
+    "load_model": r"t4@GRU_0.03_0.01@1322",
+            }
+
+append(t4gruConfig, basic, t4, gru)
+
+t4lstmConfig = {
+    "task_name": "t4@LSTM",
+    "load": False,
+    "load_model": r"t4@LSTM_0.03_0.01@1322",
+            }
+
+append(t4lstmConfig, basic, t4, lstm)
+
+t5srnConfig = {
+    "task_name": "t5@srn",
+    "load": False,
+    "load_model": r"t5@srn_0.03_0.01@1322",
+            }
+append(t5srnConfig, basic, t5, srn)
+
+t5gruConfig = {
+    "task_name": "t5@GRU",
+    "load": False,
+    "load_model": r"t5@GRU_0.03_0.01@1322",
+            }
+append(t5gruConfig, basic, t5, gru)
+
+t5lstmConfig = {
+    "task_name": "t5@LSTM",
+    "load": False,
+    "load_model": r"t5@LSTM_0.03_0.01@1322",
+            }
+append(t5lstmConfig, basic, t5, lstm)
+
+t6srnConfig = {
+    "task_name": "t6@srn",
+    "load": False,
+    "load_model": r"t6@srn_0.03_0.01@1322",
+            }
+append(t6srnConfig, basic, t6, srn)
+
+t6gruConfig = {
+    "task_name": "t6@GRU",
+    "load": False,
+    "load_model": r"t6@GRU_0.03_0.01@1322",
+            }
+append(t6gruConfig, basic, t6, gru)
+
+t6lstmConfig = {
+    "task_name": "t6@LSTM",
+    "load": False,
+    "load_model": r"t6@LSTM_0.03_0.01@1322",
+            }
+append(t6lstmConfig, basic, t6, lstm)
+
+t7srnConfig = {
+    "task_name": "t7@srn",
+    "load": False,
+    "load_model": r"t7@srn_0.03_0.01@1322",
+            }
+append(t7srnConfig, basic, t7, srn)
+
+t7gruConfig = {
+    "task_name": "t7@GRU",
+    "load": False,
+    "load_model": r"t7@GRU_0.03_0.01@1322",
+            }
+append(t7gruConfig, basic, t7, gru)
+
+t7lstmConfig = {
+    "task_name": "t7@LSTM",
+    "load": False,
+    "load_model": r"t7@LSTM_0.03_0.01@1322",
+            }
+append(t7lstmConfig, basic, t7, lstm)
+
+anbnsrnConfig = {
+    "task_name": "anbn@srn",
     "load_model": r"anbn@LSTM_1.00_0.80@1118",
     "load": False,
     }
-anbncngruconfig.update(basic)
-anbncngruconfig.update(gru)
-anbncngruconfig.update(anbncn)
 
-stackrnn = {
-    "model_name": "stacksrn",
-    "task_class": StackRNNTask,
-    "model_class": StackRNN,
-    'cell_class': StackRNNCell,
-    'controller_cell_class': nn.RNNCell,
-    "read_size": 2,
-    "n_args": 2,
-    "load_path": r"stackrnn/smodel",
-    "saved_path": r"stackrnn/smodel",
-}
-anbnstacksrnConfig = {
-    "hidden_size": 2,
-    "task_name": "anbn@stacksrn",     
-    "load_model": r'anbn@stacksrn_1.00_1.00@honey',
-    "load": True,
-    "onlytest": False,
-    "alpha": 1/32,
-    "customalization": True,
-    'weight_decay': 0,
-            }
-anbnstacksrnConfig.update(basic)
-anbnstacksrnConfig.update(anbn)
-anbnstacksrnConfig.update(stackrnn)
-
-dyck1stacksrnConfig = {
-    "task_name": "dyck1@stacksrn",     
-    "load_model": r'dyck1@stacksrn_0.90_0.26@2222',
+anbngruConfig = {
+    "task_name": "anbn@gru",
+    "load_model": r"anbn@LSTM_1.00_0.80@1118",
     "load": False,
-    "onlytest": False,
-    "alpha": 1/32,
-    "customalization": True,
-    'weight_decay': 0,
+    }
+
+anbnlstmConfig = {
+    "task_name": "anbn@lstm",
+    "load_model": r"anbn@LSTM_1.00_0.80@1118",
+    "load": False,
+    }
+
+append(anbnsrnConfig, basic, anbn, srn)
+append(anbngruConfig, basic, anbn, gru)
+append(anbnlstmConfig, basic, anbn, lstm)
+
+
+anbncnsrnConfig = {
+    "task_name": "anbncn@srn",
+    "load_model": r"anbncn@LSTM_1.00_0.80@1118",
+    "load": False,
+    }
+
+anbncngruConfig = {
+    "task_name": "anbncn@gru",
+    "load_model": r"anbncn@LSTM_1.00_0.80@1118",
+    "load": False,
+    }
+
+anbncnlstmConfig = {
+    "task_name": "anbncn@lstm",
+    "load_model": r"anbncn@LSTM_1.00_0.80@1118",
+    "load": False,
+    }
+
+append(anbncnsrnConfig, basic, anbncn, srn)
+append(anbncngruConfig, basic, anbncn, gru)
+append(anbncnlstmConfig, basic, anbncn, lstm)
+
+dyck1srnConfig = {
+    "task_name": "dyck1@srn",
+    "load_model": r"dyck1@LSTM_1.00_0.80@1118",
+    "load": False,
+    }
+
+dyck1gruConfig = {
+    "task_name": "dyck1@gru",
+    "load_model": r"dyck1@LSTM_1.00_0.80@1118",
+    "load": False,
+    }
+
+dyck1lstmConfig = {
+    "task_name": "dyck1@lstm",
+    "load_model": r"dyck1@LSTM_1.00_0.80@1118",
+    "load": False,
+    }
+
+append(dyck1srnConfig, basic, dyck1, srn)
+append(dyck1gruConfig, basic, dyck1, gru)
+append(dyck1lstmConfig, basic, dyck1, lstm)
+
+dyck2srnConfig = {
+    "task_name": "dyck2@srn",
+    "load_model": r"dyck2@LSTM_1.00_0.80@1118",
+    "load": False,
+    }
+
+dyck2gruConfig = {
+    "task_name": "dyck2@gru",
+    "load_model": r"dyck2@LSTM_1.00_0.80@1118",
+    "load": False,
+    }
+
+dyck2lstmConfig = {
+    "task_name": "dyck2@lstm",
+    "load_model": r"dyck2@LSTM_1.00_0.80@1118",
+    "load": False,
+    }
+
+append(dyck2srnConfig, basic, dyck2, srn)
+append(dyck2gruConfig, basic, dyck2, gru)
+append(dyck2lstmConfig, basic, dyck2, lstm)
+
+anbnstackgruConfig = {
+    "task_name": "anbn@stackgru",     
+    "load_model": r'anbn@stackgru_1.00_1.00@honey',
+    "load": True,
             }
-append(dyck1stacksrnConfig, basic, dyck1, stackrnn)
 
+anbncnstackgruConfig = {
+    "task_name": "anbncn@stackgru",     
+    "load_model": r'anbncn@stackgru_1.00_1.00@honey',
+    "load": True,
+            }
 
-sd = Save_data(path="stackrnn/sdata/")
+dyck1stackgruConfig = {
+    "task_name": "dyck1@stackgru",     
+    "load_model": r'dyck1@stackgru_1.00_1.00@honey',
+    "load": True,
+            }
+
+t4stackgruConfig = {
+    "task_name": "t4@stackgru",     
+    "load_model": r't4@stackgru_1.00_1.00@honey',
+    "load": True,
+            }
+append(anbnstackgruConfig, basic, anbn, stackgru)
+append(anbncnstackgruConfig, basic, anbncn, stackgru)
+append(dyck1stackgruConfig, basic, dyck1, stackgru)
+append(t4stackgruConfig, basic, t4, stackgru)
+
 dyck2stacksrnConfig = {
     "task_name": "dyck2@stacksrn",     
     "load_model": r'dyck2@stacksrn_1.00_0.01@2216',
-    "lr": 1e-3,
-    "load": False,
-    "load_last": False,
-    "onlytest": False,
-    "alpha": 1/32,
-    "customalization": False,
-    "epochs": 10,
-    "testfile_num": 1,
-    'weight_decay': 0,
-    "epoch_callback": [],
-    "batch_callback": [],
-    "step_callback":[],
-    
+    "load": True,
+    'testfile_num': 1,
+    'epochs': 50,
             }
-append(dyck2stacksrnConfig, basic, dyck2, stackrnn)
+
+dyck2stackgruConfig = {
+    "task_name": "dyck2@stackgru",     
+    "load_model": r'dyck2@stackgru_1.00_0.01@2216',
+    "load": False,
+            }
+
+dyck2stacklstmConfig = {
+    "task_name": "dyck2@stacklstm",     
+    "load_model": r'dyck2@stacklstm_1.00_0.01@2216',
+    "load": False,
+            }
+
+append(dyck2stacksrnConfig, basic, dyck2, stacksrn)
+append(dyck2stackgruConfig, basic, dyck2, stackgru)
+append(dyck2stacklstmConfig, basic, dyck2, stacklstm)
 
 if __name__ == "__main__":
     config_dict = dyck2stacksrnConfig

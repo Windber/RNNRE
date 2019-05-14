@@ -16,17 +16,17 @@ class Task:
         self.params = config_dict
         self.model = self.model_class(config_dict)
         if self.debug:
-            self.trpath = self.train_path + "/" + self.data_name + "_test1"
+            self.trpath = self.train_path + self.data_name + "_test1"
         else:
-            self.trpath = self.train_path + "/" + self.data_name + "_train"
-        self.tepath_prefix = self.test_path + "/" + self.data_name + "_test"
+            self.trpath = self.train_path + self.data_name + "_train"
+        self.tepath_prefix = self.test_path + self.data_name + "_test"
         self.trainx, self.trainy, self.testxl, self.testyl = self.get_data()
         if self.load:
             if self.load_last:
                 load_last = pickle.load(open('finaltrain', 'rb'))
                 load_model = load_last
             else:
-                load_model = self.load_path + "/" + self.load_model
+                load_model = self.load_path + self.load_model
             print(load_model)
             self.state, self.minloss, self.maxaccuracy = torch.load(load_model)
             self.model.load_state_dict(self.state)
@@ -65,7 +65,7 @@ class Task:
                 self.state = self.model.state_dict()
                 self.minloss = eloss
                 self.maxaccuracy = eacc
-                save_model = self.saved_path + "/" + self.task_name + "_%.2f_%.2f" % (self.maxaccuracy, self.minloss) + "@" + time.strftime("%H%M")
+                save_model = self.saved_path + self.task_name + "_%.2f_%.2f" % (self.maxaccuracy, self.minloss) + "@" + time.strftime("%H%M")
                 torch.save([self.state, self.minloss, self.maxaccuracy], 
                            save_model)
         save_model = self.saved_path + "/" + self.task_name + "_%.2f_%.2f" % (self.maxaccuracy, self.minloss) + "@" + time.strftime("%H%M")

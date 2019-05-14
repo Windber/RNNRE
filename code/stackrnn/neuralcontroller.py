@@ -25,6 +25,7 @@ class RNNController(nn.Module):
             linear_init_(self.fc_u)
             gru_init_(self.rnn)
             self.fc_u.bias.data.add_(torch.tensor(-1, dtype=torch.float32))
+            self.fc_s1.bias.data.add_(torch.tensor(1, dtype=torch.float32))
             if self.customalization:
                 apm = 5
                 if self.data_name == 'anbn':

@@ -8,6 +8,7 @@ import pandas as pd
 import time
 import sys
 from stackrnn.task import Task
+from stackrnn.initialization import rnn_init_, linear_init_
 class RNN(nn.Module):
     def __init__(self, params):
         super().__init__()
@@ -20,13 +21,8 @@ class RNN(nn.Module):
         self.linear = nn.Linear(self.hidden_size, self.output_size)
         self.nonlinear = nn.Sigmoid()
         if self.initialization:
-            nn.init.xavier_uniform_(self.linear.weight.data)
-            nn.init.uniform_(self.linear.bias.data, 0, 0)
-            nn.init.xavier_uniform_(self.cell.weight_ih.data)
-            nn.init.orthogonal_(self.cell.weight_hh.data)
-            nn.init.uniform_(self.cell.bias_ih.data, 0, 0)
-            nn.init.uniform_(self.cell.bias_hh.data, 0, 0)
-        
+            rnn_init_(self.cell)
+            linear_init_(self.linear)
         self.cell.to(self.device)
         self.linear.to(self.device)
     def init(self):
