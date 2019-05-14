@@ -30,6 +30,8 @@ class Dyck2:
             rselect = rselect if len(self.Grammar.P[replace][rselect]) > 0 else 1- rselect
             replace = self.Grammar.P[replace][rselect][random.randint(0, len(self.Grammar.P[replace][rselect]) - 1)]
             cur = cur[:mat.start(0)] + replace + cur[mat.end(0):]
+            if len(cur) > 128:
+                p = p * 0.9
             if len(cur) > 510:
                 return 'secret'
         return cur
@@ -86,11 +88,11 @@ class Dyck2:
         label = l + ehex * (p - length)
         return feature, label
 
-
+import sys
 if __name__ == "__main__":
-    propab = [random.random()*0.5 for i in range(10)]
+    propab = list(map(lambda x: max(0.01, min(0.99, x)), [random.random() for i in range(10)]))
     second = True
-    iter = 10000
+    iter = 10000 if sys.argv[1] is None else int(sys.argv[1])
 
     
     d2 = Dyck2(V=["S", "R", "B", "T"],
@@ -136,7 +138,7 @@ if __name__ == "__main__":
                 elif depth >32 and depth<=64 and length > 128 and length <= 256:
                     hook = _test4
                     padding = 256
-                elif depth >64 and depth<=128 and length > 256 and length <= 512:
+                elif depth >64  and length > 256 and length <= 512:
                     hook = _test5
                     padding = 512
                 else:

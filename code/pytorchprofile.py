@@ -4,7 +4,7 @@ from stackrnn.stackrnntask import StackRNNTask, StackRNN
 from stackrnn.rnntask import RNNTask, RNN
 from stackrnn.nlfunction import *
 from stackrnn.stackrnncell import StackRNNCell
-from stackrnn.callback import Save_data, Sdforlstm
+from stackrnn.callback import Save_data, Sdforlstm, Sdforstacksrn
 
 def append(ori, *dess):
     key = ori.keys()
@@ -14,7 +14,7 @@ def append(ori, *dess):
                 ori[k] = des[k]
 # sd = Sdforlstm(path="stackrnn/sdata/", task='t6@lstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
-# sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
+sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 basic = {
     "batch_size": 100,
     "epochs": 50,
@@ -28,11 +28,12 @@ basic = {
     'validate': False,
     "load_path": r"stackrnn/smodel/",
     "saved_path": r"stackrnn/smodel/",
-    'load_last': True,
-    'epoch_callback': [],
-    'batch_callback': [],
-    'step_callback': [],
-    'load': False,
+    'load_last': False,
+    'epoch_callback': [sd],
+    'batch_callback': [sd],
+    'step_callback': [sd],
+    'load': True,
+    'onlytest': True,
     }
 
 rnn = {
@@ -462,8 +463,8 @@ append(t4stackgruConfig, basic, t4, stackgru)
 
 dyck2stacksrnConfig = {
     "task_name": "dyck2@stacksrn",     
-    "load_model": r'dyck2@stacksrn_1.00_0.01@2216',
-    'testfile_num': 1,
+    "load_model": r'dyck2@stacksrn_0.98_0.04@2327',
+    'testfile_num': 5,
     'epochs': 50,
     'alpha': 0.002,
             }
