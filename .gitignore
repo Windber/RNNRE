@@ -1,4 +1,7 @@
-*/smodel/*
 *.pyc
-*__pycache__*
-*checkpoint*
+code/stackrnn/smodel/*
+code/basicrnn/smodel/*
+code/stackrnn/sdata/*
+code/stackrnn/__pycache__/*
+code/basicrnn/__pycache__/*
+*.checkpoint.ipynb
