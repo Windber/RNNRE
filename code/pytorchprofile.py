@@ -32,6 +32,7 @@ basic = {
     'epoch_callback': [],
     'batch_callback': [],
     'step_callback': [],
+    'load': False,
     }
 
 rnn = {
@@ -68,12 +69,10 @@ stackrnn = {
     "testfile_num": 1,
     "onlytest": False,
     "alpha": 0,
-    "customalization": False,
-    "epoch_callback": [],
-    "batch_callback": [],
-    "step_callback":[],
+    "customalization": True,
     "epochs": 10,
     'weight_decay': 0,
+    
 }
 
 stacksrn = {
@@ -464,7 +463,6 @@ append(t4stackgruConfig, basic, t4, stackgru)
 dyck2stacksrnConfig = {
     "task_name": "dyck2@stacksrn",     
     "load_model": r'dyck2@stacksrn_1.00_0.01@2216',
-    "load": True,
     'testfile_num': 1,
     'epochs': 50,
     'alpha': 0.002,
