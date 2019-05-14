@@ -57,7 +57,7 @@ class RNNTask(Task):
     def __init__(self, params):
         super().__init__(params)
         self.cel = nn.MSELoss(reduction="sum")
-        self.optim = RMSprop(self.model.parameters(), lr=self.lr)
+        self.optim = RMSprop(self.model.parameters(), lr=self.lr, momentum=0.9)
         
     def init(self):
         self.model.init(self.batch_size)

@@ -1,2 +1,4 @@
 */smodel/*
 *.pyc
+*__pycache__*
+*checkpoint*
