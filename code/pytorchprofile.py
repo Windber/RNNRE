@@ -17,12 +17,12 @@ sd = None
 # sd = Sdforlstm(path="stackrnn/sdata/", task='t6@lstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
-task = 't3'  + 'gru' 
-sd = Save_loss(path='stackrnn/sdata/', task=task)
+task = 'anbn'  + 'lstm' 
+#sd = Save_loss(path='stackrnn/sdata/', task=task)
 sdl = [sd] if sd is not None else []
 basic = {
     "batch_size": 100,
-    "epochs": 100,
+    "epochs": 40,
     "testfile_num": 5,
     "lr": 1e-3,
     "device": torch.device("cpu"),
@@ -34,9 +34,9 @@ basic = {
     "load_path": r"stackrnn/smodel/",
     "saved_path": r"stackrnn/smodel/",
     'callback': sdl,
-    'load': False,
+    'load': True,
     'onlytest': False,
-    'load_last': False,
+    'load_last': True,
 
     }
 
@@ -52,7 +52,7 @@ gru = {
 
 lstm = {
     "model_name": "LSTM",
-    "cell_class": MyLSTMCell,
+    "cell_class": PHLSTMCell,
     }
 
 srn = {
@@ -134,15 +134,15 @@ append(t6, tomita)
 append(t7, tomita)
 
 cl = {
-    "train_path": r"../data_predicttask/cl/",
-    "test_path": r"../data_predicttask/cl/",
+    "train_path": r"../data_predicttask/countlanguage/",
+    "test_path": r"../data_predicttask/countlanguage/",
     }
 
 anbn = {
     "alphabet": {"a": [2], "b": [3], "s": [0], "e": [1], "#": [1]},
     "classes": {"3": [1, 1, 0], "6": [0, 1, 1], "4": [0, 0, 1], "1": [1, 0, 0]},
     "input_size": 4,
-    "hidden_size": 2,
+    "hidden_size": 3,
     "output_size": 3,
     "data_name": "anbn",
     }
@@ -356,7 +356,6 @@ anbngruConfig = {
 anbnlstmConfig = {
     "task_name": "anbn@lstm",
     "load_model": r"anbn@LSTM_1.00_0.80@1118",
-    "load": False,
     }
 
 append(anbnsrnConfig, basic, anbn, srn)

@@ -40,7 +40,7 @@ class Task:
         if not self.onlytest:
             self.train()
         self.test()
-        emailto()
+        emailto(self.task_name)
         
     def test(self):
         print("Test stage:")

@@ -57,13 +57,19 @@ class PHLSTMCell(nn.Module):
         self.weight_ih = torch.zeros([self.input_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True)
         self.weight_hh = torch.zeros([self.hidden_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True)
         self.weight_ch = torch.zeros([self.hidden_size*3, self.hidden_size], dtype=torch.float32, requires_grad=True)
-        init.xavier_uniform_(self.weight_ch.data)
+        init.orthogonal_(self.weight_ch.data)
         self.bias_ih = torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True)
         self.bias_hh = torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True)
         self.bias_ch = torch.zeros([self.hidden_size*3], dtype=torch.float32, requires_grad=True)
         init.uniform_(self.bias_ch.data, 0, 0)
         self.sigmoid = nn.Sigmoid()
         self.tanh = nn.Tanh()
+        
+    def init(self):
+        rnn_init_(self)
+        amp = 2
+        self.bias_ih.data.add_(torch.tensor([-amp, -amp, -amp, amp, amp, amp, 0, 0, 0, -amp, -amp, -amp], dtype=torch.float32))
+
     def forward(self, x, hc):
         h = hc[0]
         c = hc[1]
@@ -111,7 +117,10 @@ class RNN(nn.Module):
         self.linear = nn.Linear(self.hidden_size, self.output_size)
         self.nonlinear = nn.Sigmoid()
         if self.initialization:
-            rnn_init_(self.cell)
+            if hasattr(self.cell, 'init'):
+                self.cell.init()
+            else:
+                rnn_init_(self.cell)
             linear_init_(self.linear)
         self.cell.to(self.device)
         self.linear.to(self.device)
