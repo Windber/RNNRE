@@ -17,8 +17,9 @@ sd = None
 # sd = Sdforlstm(path="stackrnn/sdata/", task='t6@lstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
-# sd = Save_loss(path='stackrnn/sdata/', task='t1@srn')
-sdl = sd if sd is not None else []
+task = 't4'  + 'lstm' 
+sd = Save_loss(path='stackrnn/sdata/', task=task)
+sdl = [sd] if sd is not None else []
 basic = {
     "batch_size": 100,
     "epochs": 10,
@@ -479,7 +480,7 @@ append(dyck2stackgruConfig, basic, dyck2, stackgru)
 append(dyck2stacklstmConfig, basic, dyck2, stacklstm)
 
 if __name__ == "__main__":
-            config_dict = t1lstmConfig
+            config_dict = eval( task + 'Config')
             task = config_dict["task_class"](config_dict)
             task.experiment()
 #     for t in ['t1', 't2', 't3', 't4', 't5', 't6', 't7']:
