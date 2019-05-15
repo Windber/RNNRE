@@ -9,6 +9,25 @@ import time
 import sys
 from stackrnn.task import Task
 from stackrnn.initialization import rnn_init_, linear_init_
+class PHLSTM(nn.Module):
+    def __init__(self, params):
+        super().__init__()
+        self.params = params
+        self.weight_ih = torch.zeros([self.input_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True)
+        self.weight_hh = torch.zeros([self.hidden_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True)
+        self.bias_ih = torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True)
+        self.bias_hh = torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True)
+        self.sigmoid = nn.Sigmoid()
+        self.tanh = nn.Tanh()
+    def __getattr__(self, name):
+        if name in self.params:
+            return self.params[name]
+        else:
+            return super().__getattr__(name)
+    def forward(self, x, hc):
+        h = hc[0]
+        c = hc[1]
+        
 class RNN(nn.Module):
     def __init__(self, params):
         super().__init__()

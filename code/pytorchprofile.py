@@ -17,13 +17,13 @@ sd = None
 # sd = Sdforlstm(path="stackrnn/sdata/", task='t6@lstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
-sd = Save_loss(path='stackrnn/sdata/', task='t1@srn')
+# sd = Save_loss(path='stackrnn/sdata/', task='t1@srn')
 sdl = sd if sd is not None else []
 basic = {
     "batch_size": 100,
-    "epochs": 100,
+    "epochs": 10,
     "testfile_num": 5,
-    "lr": 1e-4,
+    "lr": 1e-3,
     "device": torch.device("cpu"),
     "verbose": False,
     "debug": False,
@@ -32,9 +32,11 @@ basic = {
     'validate': False,
     "load_path": r"stackrnn/smodel/",
     "saved_path": r"stackrnn/smodel/",
-    'onlytest': False,
-    'load_last': True,
     'callback': sdl,
+    'load': True,
+    'onlytest': False,
+    'load_last': False,
+
     }
 
 rnn = {
@@ -68,15 +70,7 @@ stackrnn = {
     "read_size": 2,
     "n_args": 2,
     "lr": 1e-3,
-    "testfile_num": 1,
-    "onlytest": False,
     "alpha": 0,
-    "customalization": False,
-    "epoch_callback": [],
-    "batch_callback": [],
-    "step_callback":[],
-    "epochs": 10,
-    'weight_decay': 0,
 }
 
 stacksrn = {
@@ -466,23 +460,19 @@ append(t4stackgruConfig, basic, t4, stackgru)
 
 dyck2stacksrnConfig = {
     "task_name": "dyck2@stacksrn",     
-    "load_model": r'dyck2@stacksrn_1.00_0.01@2216',
-    "load": True,
-    'testfile_num': 1,
-    'epochs': 50,
+    "load_model": r'dyck2@stacksrn_1.00_0.00@0005',
     'alpha': 0.002,
+    "customalization": True,
             }
 
 dyck2stackgruConfig = {
     "task_name": "dyck2@stackgru",     
     "load_model": r'dyck2@stackgru_1.00_0.01@2216',
-    "load": False,
             }
 
 dyck2stacklstmConfig = {
     "task_name": "dyck2@stacklstm",     
     "load_model": r'dyck2@stacklstm_1.00_0.01@2216',
-    "load": False,
             }
 
 append(dyck2stacksrnConfig, basic, dyck2, stacksrn)
@@ -490,12 +480,15 @@ append(dyck2stackgruConfig, basic, dyck2, stackgru)
 append(dyck2stacklstmConfig, basic, dyck2, stacklstm)
 
 if __name__ == "__main__":
-    for t in ['t1', 't2', 't3', 't4', 't5', 't6', 't7']:
-        for r in ['srn', 'gru', 'lstm']:
-    
-            config_dict = eval(t + r + 'Config')
-            sd = Save_loss(path='stackrnn/sdata/', task=t+r)
-            config_dict['callback'] = [sd]
+            config_dict = dyck2srnConfig
             task = config_dict["task_class"](config_dict)
             task.experiment()
+#     for t in ['t1', 't2', 't3', 't4', 't5', 't6', 't7']:
+#         for r in ['srn', 'gru', 'lstm']:
+#     
+#             config_dict = eval(t + r + 'Config')
+#             sd = Save_loss(path='stackrnn/sdata/', task=t+r)
+#             config_dict['callback'] = [sd]
+#             task = config_dict["task_class"](config_dict)
+#             task.experiment()
             
