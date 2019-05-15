@@ -17,13 +17,14 @@ sd = None
 # sd = Sdforlstm(path="stackrnn/sdata/", task='t6@lstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
-# sd = Save_loss(path='stackrnn/sdata/', task='t1@srn')
-sdl = sd if sd is not None else []
+task = 't4'  + 'lstm' 
+sd = Save_loss(path='stackrnn/sdata/', task=task)
+sdl = [sd] if sd is not None else []
 basic = {
     "batch_size": 100,
-    "epochs": 10,
+    "epochs": 100,
     "testfile_num": 5,
-    "lr": 1e-3,
+    "lr": 1e-4,
     "device": torch.device("cpu"),
     "verbose": False,
     "debug": False,
@@ -33,7 +34,7 @@ basic = {
     "load_path": r"stackrnn/smodel/",
     "saved_path": r"stackrnn/smodel/",
     'callback': sdl,
-    'load': True,
+    'load': False,
     'onlytest': False,
     'load_last': False,
 
@@ -480,7 +481,7 @@ append(dyck2stackgruConfig, basic, dyck2, stackgru)
 append(dyck2stacklstmConfig, basic, dyck2, stacklstm)
 
 if __name__ == "__main__":
-            config_dict = dyck2srnConfig
+            config_dict = eval( task + 'Config')
             task = config_dict["task_class"](config_dict)
             task.experiment()
 #     for t in ['t1', 't2', 't3', 't4', 't5', 't6', 't7']:
