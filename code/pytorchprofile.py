@@ -17,14 +17,14 @@ sd = None
 # sd = Sdforlstm(path="stackrnn/sdata/", task='t6@lstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
-task = 't3'  + 'gru' 
+task = 't2'  + 'gru' 
 sd = Save_loss(path='stackrnn/sdata/', task=task)
 sdl = [sd] if sd is not None else []
 basic = {
     "batch_size": 100,
     "epochs": 100,
     "testfile_num": 5,
-    "lr": 1e-3,
+    "lr": 1e-4,
     "device": torch.device("cpu"),
     "verbose": False,
     "debug": False,
@@ -52,7 +52,7 @@ gru = {
 
 lstm = {
     "model_name": "LSTM",
-    "cell_class": MyLSTMCell,
+    "cell_class": nn.LSTMCell,
     }
 
 srn = {
@@ -315,7 +315,6 @@ append(t6gruConfig, basic, t6, gru)
 t6lstmConfig = {
     "task_name": "t6@LSTM",
     "load": False,
-    'onlytest': True,
     "load_model": r"t6@LSTM_0.03_0.01@1322",
             }
 append(t6lstmConfig, basic, t6, lstm)

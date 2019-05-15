@@ -8,8 +8,8 @@ def timeprofile(fun):
         print(fun.__name__ + " " + str(time.time() - s))
         return r
     return tmp
-def emailto(self):
-    text = "Task " + self.task_name + " completed."
+def emailto(task_name):
+    text = "Task " + task_name + " completed."
     msg = MIMEText(text, 'plain', 'utf-8')
     smtp = smtplib.SMTP()
     smtp.connect("smtp.126.com")
