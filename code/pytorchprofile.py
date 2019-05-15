@@ -14,7 +14,7 @@ def append(ori, *dess):
                 ori[k] = des[k]
                 
 sd = None
-# sd = Sdforlstm(path="stackrnn/sdata/", task='t6@lstm')
+sd = Sdforlstm(path="stackrnn/sdata/", task='anbn@phlstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 task = 'anbn'  + 'lstm' 
@@ -22,7 +22,7 @@ task = 'anbn'  + 'lstm'
 sdl = [sd] if sd is not None else []
 basic = {
     "batch_size": 100,
-    "epochs": 1,
+    "epochs": 50,
     "testfile_num": 5,
     "lr": 1e-3,
     "device": torch.device("cpu"),
@@ -86,7 +86,7 @@ stackgru = {
 
 stacklstm = {
     "model_name": "stacklstm",
-    'controller_cell_class': nn.LSTMCell,
+    'controller_cell_class': PHLSTMCell,
     }
 
 append(stacksrn, stackrnn)
