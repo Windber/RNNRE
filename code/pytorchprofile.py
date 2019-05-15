@@ -17,12 +17,12 @@ sd = None
 # sd = Sdforlstm(path="stackrnn/sdata/", task='t6@lstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
-task = 't4'  + 'lstm' 
+task = 't3'  + 'gru' 
 sd = Save_loss(path='stackrnn/sdata/', task=task)
 sdl = [sd] if sd is not None else []
 basic = {
     "batch_size": 100,
-    "epochs": 10,
+    "epochs": 100,
     "testfile_num": 5,
     "lr": 1e-3,
     "device": torch.device("cpu"),
