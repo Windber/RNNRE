@@ -3,37 +3,69 @@
 '''
 import torch
 import torch.nn as nn
+import torch.nn.init as init
 from torch.optim import RMSprop
 import pandas as pd
 import time
 import sys
 from stackrnn.task import Task
 from stackrnn.initialization import rnn_init_, linear_init_
-class PHLSTM(nn.Module):
-    def __init__(self, params):
+class PHLSTMCell(nn.Module):
+    def __init__(self, input_size, hidden_size):
         super().__init__()
-        self.params = params
+        self.input_size = input_size
+        self.hidden_size = hidden_size
         self.weight_ih = torch.zeros([self.input_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True)
         self.weight_hh = torch.zeros([self.hidden_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True)
+        self.weight_ch = torch.zeros([self.hidden_size*3, self.hidden_size], dtype=torch.float32, requires_grad=True)
+        init.xavier_uniform_(self.weight_ch.data)
         self.bias_ih = torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True)
         self.bias_hh = torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True)
+        self.bias_ch = torch.zeros([self.hidden_size*3], dtype=torch.float32, requires_grad=True)
+        init.uniform_(self.bias_ch.data, 0, 0)
         self.sigmoid = nn.Sigmoid()
         self.tanh = nn.Tanh()
-    def __getattr__(self, name):
-        if name in self.params:
-            return self.params[name]
-        else:
-            return super().__getattr__(name)
     def forward(self, x, hc):
         h = hc[0]
         c = hc[1]
+        i = self.sigmoid(torch.mm(x, self.weight_ih[self.input_size * 0:self.input_size * 1, :])
+                          + self.bias_ih[self.hidden_size * 0:self.hidden_size * 1]
+                         + torch.mm(h, self.weight_hh[self.hidden_size * 0:self.hidden_size * 1, :])
+                          + self.bias_hh[self.hidden_size * 0:self.hidden_size * 1]
+                         + torch.mm(c, self.weight_ch[self.hidden_size * 0:self.hidden_size * 1, :])
+                          + self.bias_ch[self.hidden_size * 0:self.hidden_size * 1]
+                        
+                          )
         
+        f = self.sigmoid(torch.mm(x, self.weight_ih[self.input_size * 1:self.input_size * 2, :])
+                          + self.bias_ih[self.hidden_size * 1:self.hidden_size * 2]
+                         + torch.mm(h, self.weight_hh[self.hidden_size * 1:self.hidden_size * 2, :])
+                          + self.bias_hh[self.hidden_size * 1:self.hidden_size * 2]
+                         + torch.mm(c, self.weight_ch[self.hidden_size * 1:self.hidden_size * 2, :])
+                          + self.bias_ch[self.hidden_size * 1:self.hidden_size * 2]
+                          )
+        g = self.tanh(torch.mm(x, self.weight_ih[self.input_size * 2:self.input_size * 3, :])
+                          + self.bias_ih[self.hidden_size * 2:self.hidden_size * 3]
+                         + torch.mm(h, self.weight_hh[self.hidden_size * 2:self.hidden_size * 3, :])
+                          + self.bias_hh[self.hidden_size * 2:self.hidden_size * 3]
+                          )
+        ct = f * c + i * g
+        o = self.sigmoid(torch.mm(x, self.weight_ih[self.input_size * 3:self.input_size * 4, :])
+                          + self.bias_ih[self.hidden_size * 3:self.hidden_size * 4]
+                         + torch.mm(h, self.weight_hh[self.hidden_size * 3:self.hidden_size * 4, :])
+                          + self.bias_hh[self.hidden_size * 3:self.hidden_size * 4]
+                         + torch.mm(ct, self.weight_ch[self.hidden_size * 2:self.hidden_size * 3, :])
+                          + self.bias_ch[self.hidden_size * 2:self.hidden_size * 3]
+                          )
+
+        ht = o * self.tanh(ct)
+        return ht, ct
 class RNN(nn.Module):
     def __init__(self, params):
         super().__init__()
         self.params = params
         if self.model_name == 'LSTM':
-            self.cell = self.cell_class(self.input_size+self.hidden_size, self.hidden_size)
+            self.cell = self.cell_class(self.input_size, self.hidden_size)
         else:
             self.cell = self.cell_class(self.input_size, self.hidden_size)
         self.hidden = None
@@ -56,7 +88,7 @@ class RNN(nn.Module):
         for i in range(timestep):
             
             if self.model_name == 'LSTM':
-                self.hidden = self.cell(torch.cat([x[:, i, :], self.hidden[1]], 1), self.hidden)
+                self.hidden = self.cell(x[:, i, :], self.hidden)
                 tmp = self.hidden[0]
             else:
                 self.hidden = self.cell(x[:, i, :], self.hidden)

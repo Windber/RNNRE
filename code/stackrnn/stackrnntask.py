@@ -67,12 +67,12 @@ class StackRNNTask(Task):
         yp = yp.view(-1, self.output_size)
         ys = ys.view(-1, self.output_size)
         batch_loss = self.cel(yp, ys)
-        #stack_loss = self.cel(self.model.cell.stack._actual, torch.zeros(self.batch_size, 1))
-        #batch_loss = (1 - self.alpha) * batch_loss + self.alpha * stack_loss
+        stack_loss = self.cel(self.model.cell.stack._actual, torch.zeros(self.batch_size, 1))
+        batch_loss = (1 - self.alpha) * batch_loss + self.alpha * stack_loss
         if istraining:
             self.optim.zero_grad()
             batch_loss.backward()
-            #torch.nn.utils.clip_grad_value_(self.model.parameters(), 10)
+            torch.nn.utils.clip_grad_value_(self.model.parameters(), 10)
             self.optim.step()
         if self.verbose:
             print("Train batch %d Loss: %f Accuracy: %f" % (bn, batch_loss / total, correct / total))
