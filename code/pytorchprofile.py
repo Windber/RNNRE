@@ -22,7 +22,7 @@ task = 'anbn'  + 'lstm'
 sdl = [sd] if sd is not None else []
 basic = {
     "batch_size": 100,
-    "epochs": 40,
+    "epochs": 1,
     "testfile_num": 5,
     "lr": 1e-3,
     "device": torch.device("cpu"),

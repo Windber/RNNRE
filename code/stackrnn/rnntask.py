@@ -15,10 +15,10 @@ class MyLSTMCell(nn.Module):
         super().__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
-        self.weight_ih = torch.zeros([self.input_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True)
-        self.weight_hh = torch.zeros([self.hidden_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True)
-        self.bias_ih = torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True)
-        self.bias_hh = torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True)
+        self.weight_ih = nn.Parameter(torch.zeros([self.input_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True))
+        self.weight_hh = nn.Parameter(torch.zeros([self.hidden_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True))
+        self.bias_ih = nn.Parameter(torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True))
+        self.bias_hh = nn.Parameter(torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True))
         self.sigmoid = nn.Sigmoid()
         self.tanh = nn.Tanh()
     def forward(self, x, hc):
@@ -54,13 +54,13 @@ class PHLSTMCell(nn.Module):
         super().__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
-        self.weight_ih = torch.zeros([self.input_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True)
-        self.weight_hh = torch.zeros([self.hidden_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True)
-        self.weight_ch = torch.zeros([self.hidden_size*3, self.hidden_size], dtype=torch.float32, requires_grad=True)
+        self.weight_ih = nn.Parameter(torch.zeros([self.input_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True))
+        self.weight_hh = nn.Parameter(torch.zeros([self.hidden_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True))
+        self.weight_ch = nn.Parameter(torch.zeros([self.hidden_size*3, self.hidden_size], dtype=torch.float32, requires_grad=True))
         init.orthogonal_(self.weight_ch.data)
-        self.bias_ih = torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True)
-        self.bias_hh = torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True)
-        self.bias_ch = torch.zeros([self.hidden_size*3], dtype=torch.float32, requires_grad=True)
+        self.bias_ih = nn.Parameter(torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True))
+        self.bias_hh = nn.Parameter(torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True))
+        self.bias_ch = nn.Parameter(torch.zeros([self.hidden_size*3], dtype=torch.float32, requires_grad=True))
         init.uniform_(self.bias_ch.data, 0, 0)
         self.sigmoid = nn.Sigmoid()
         self.tanh = nn.Tanh()
