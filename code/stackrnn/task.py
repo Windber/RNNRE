@@ -11,6 +11,7 @@ import pandas as pd
 import random
 import time
 import pickle
+from profile import emailto
 class Task:
     def __init__(self, config_dict):
         self.params = config_dict
@@ -39,6 +40,7 @@ class Task:
         if not self.onlytest:
             self.train()
         self.test()
+        emailto()
         
     def test(self):
         print("Test stage:")

@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from stackrnn.stackrnntask import StackRNNTask, StackRNN
-from stackrnn.rnntask import RNNTask, RNN, PHLSTMCell
+from stackrnn.rnntask import RNNTask, RNN, PHLSTMCell, MyLSTMCell
 from stackrnn.nlfunction import *
 from stackrnn.stackrnncell import StackRNNCell
 from stackrnn.callback import Save_data, Sdforlstm, Save_loss
@@ -21,9 +21,9 @@ sd = None
 sdl = sd if sd is not None else []
 basic = {
     "batch_size": 100,
-    "epochs": 100,
+    "epochs": 10,
     "testfile_num": 5,
-    "lr": 1e-4,
+    "lr": 1e-3,
     "device": torch.device("cpu"),
     "verbose": False,
     "debug": False,
@@ -51,7 +51,7 @@ gru = {
 
 lstm = {
     "model_name": "LSTM",
-    "cell_class": PHLSTMCell,
+    "cell_class": MyLSTMCell,
     }
 
 srn = {
@@ -200,8 +200,7 @@ append(t1gruConfig, basic, t1, gru)
 
 t1lstmConfig = {
     "task_name": "t1@LSTM",
-    "load": False,
-    "load_model": r"t1@LSTM_0.03_0.01@1322",
+    "load_model": r"t1@LSTM_1.00_0.02@1312",
             }
 
 append(t1lstmConfig, basic, t1, lstm)

@@ -10,6 +10,45 @@ import time
 import sys
 from stackrnn.task import Task
 from stackrnn.initialization import rnn_init_, linear_init_
+class MyLSTMCell(nn.Module):
+    def __init__(self, input_size, hidden_size):
+        super().__init__()
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+        self.weight_ih = torch.zeros([self.input_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True)
+        self.weight_hh = torch.zeros([self.hidden_size*4, self.hidden_size], dtype=torch.float32, requires_grad=True)
+        self.bias_ih = torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True)
+        self.bias_hh = torch.zeros([self.hidden_size*4], dtype=torch.float32, requires_grad=True)
+        self.sigmoid = nn.Sigmoid()
+        self.tanh = nn.Tanh()
+    def forward(self, x, hc):
+        h = hc[0]
+        c = hc[1]
+        i = self.sigmoid(torch.mm(x, self.weight_ih[self.input_size * 0:self.input_size * 1, :])
+                          + self.bias_ih[self.hidden_size * 0:self.hidden_size * 1]
+                         + torch.mm(h, self.weight_hh[self.hidden_size * 0:self.hidden_size * 1, :])
+                          + self.bias_hh[self.hidden_size * 0:self.hidden_size * 1]
+                          )
+        
+        f = self.sigmoid(torch.mm(x, self.weight_ih[self.input_size * 1:self.input_size * 2, :])
+                          + self.bias_ih[self.hidden_size * 1:self.hidden_size * 2]
+                         + torch.mm(h, self.weight_hh[self.hidden_size * 1:self.hidden_size * 2, :])
+                          + self.bias_hh[self.hidden_size * 1:self.hidden_size * 2]
+                          )
+        g = self.tanh(torch.mm(x, self.weight_ih[self.input_size * 2:self.input_size * 3, :])
+                          + self.bias_ih[self.hidden_size * 2:self.hidden_size * 3]
+                         + torch.mm(h, self.weight_hh[self.hidden_size * 2:self.hidden_size * 3, :])
+                          + self.bias_hh[self.hidden_size * 2:self.hidden_size * 3]
+                          )
+        ct = f * c + i * g
+        o = self.sigmoid(torch.mm(x, self.weight_ih[self.input_size * 3:self.input_size * 4, :])
+                          + self.bias_ih[self.hidden_size * 3:self.hidden_size * 4]
+                         + torch.mm(h, self.weight_hh[self.hidden_size * 3:self.hidden_size * 4, :])
+                          + self.bias_hh[self.hidden_size * 3:self.hidden_size * 4]
+                          )
+
+        ht = o * self.tanh(ct)
+        return ht, ct
 class PHLSTMCell(nn.Module):
     def __init__(self, input_size, hidden_size):
         super().__init__()
