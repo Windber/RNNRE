@@ -131,7 +131,7 @@ class RNN(nn.Module):
     def init(self):
         if self.model_name == 'GRU' or self.model_name == 'SRN':
             self.hidden = torch.zeros(self.batch_size, self.hidden_size)
-        elif self.model_name == 'LSTM':
+        elif self.model_name == 'LSTM' or self.model_name == 'PHLSTM':
             self.hidden = (torch.zeros(self.batch_size, self.hidden_size).to(self.device), 
                            torch.zeros(self.batch_size, self.hidden_size).to(self.device))
     def forward(self, x):
