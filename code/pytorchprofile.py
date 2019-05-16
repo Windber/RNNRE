@@ -23,9 +23,9 @@ task = sys.argv[1] + sys.argv[2]
 sdl = [sd] if sd is not None else []
 basic = {
     "batch_size": 100,
-    "epochs": 10,
+    "epochs": 20,
     "testfile_num": 2,
-    "lr": 1e-3,
+    "lr": 1e-1,
     "device": torch.device("cpu"),
     "verbose": False,
     "debug": False,
@@ -36,8 +36,8 @@ basic = {
     "saved_path": r"stackrnn/smodel/",
     'callback': sdl,
     'load': True,
-    'onlytest': False,
-    'load_last': True,
+    'onlytest': True,
+    'load_last': False,
 
     }
 
@@ -485,7 +485,7 @@ dyck2stacksrnConfig = {
 
 dyck2stackgruConfig = {
     "task_name": "dyck2@stackgru",     
-    "load_model": r'dyck2@stackgru_0.99_0.03@1519',
+    "load_model": r'dyck2@stackgru_0.88_0.20@1018',
             }
 
 dyck2stacklstmConfig = {
