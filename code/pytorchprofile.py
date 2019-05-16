@@ -13,11 +13,12 @@ def append(ori, *dess):
             if k not in key:
                 ori[k] = des[k]
                 
+import sys
 sd = None
-sd = Sdforlstm(path="stackrnn/sdata/", task='anbn@phlstm')
+# sd = Sdforlstm(path="stackrnn/sdata/", task='anbn@phlstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
-task = 'anbn'  + 'lstm' 
+task = sys.argv[1] + sys.argv[2] 
 #sd = Save_loss(path='stackrnn/sdata/', task=task)
 sdl = [sd] if sd is not None else []
 basic = {
@@ -36,7 +37,7 @@ basic = {
     'callback': sdl,
     'load': True,
     'onlytest': False,
-    'load_last': True,
+    'load_last': False,
 
     }
 
@@ -364,7 +365,7 @@ anbnlstmConfig = {
 
 anbnphlstmConfig = {
     "task_name": "anbn@phlstm",
-    "load_model": r"anbn@LSTM_1.00_0.80@1118",
+    "load_model": r"finaltrain_anbnphlstm",
     }
 
 append(anbnsrnConfig, basic, anbn, srn)
@@ -393,7 +394,7 @@ anbncnlstmConfig = {
 
 anbncnphlstmConfig = {
     "task_name": "anbncn@phlstm",
-    "load_model": r"anbncn@LSTM_1.00_0.80@1118",
+    "load_model": r"finaltrain_anbncnphlstm",
     }
 
 append(anbncnsrnConfig, basic, anbncn, srn)
@@ -421,7 +422,7 @@ dyck1lstmConfig = {
 
 dyck1phlstmConfig = {
     "task_name": "dyck1@phlstm",
-    "load_model": r"dyck1@LSTM_1.00_0.80@1118",
+    "load_model": r"finaltrain_dyck1phlstm",
     }
 append(dyck1srnConfig, basic, dyck1, srn)
 append(dyck1gruConfig, basic, dyck1, gru)
