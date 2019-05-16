@@ -4,7 +4,7 @@ from stackrnn.stackrnntask import StackRNNTask, StackRNN
 from stackrnn.rnntask import RNNTask, RNN, PHLSTMCell, MyLSTMCell
 from stackrnn.nlfunction import *
 from stackrnn.stackrnncell import StackRNNCell
-from stackrnn.callback import Save_data, Sdforlstm, Save_loss
+from stackrnn.callback import Save_data, Sdforlstm, Save_loss, Sdforstacksrn
 
 def append(ori, *dess):
     key = ori.keys()
@@ -15,16 +15,18 @@ def append(ori, *dess):
                 
 import sys
 sd = None
-# sd = Sdforlstm(path="stackrnn/sdata/", task='anbn@phlstm')
+# sd = Sdforlstm(path="stackrnn/sdata/", task='dyck1@phlstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 task = sys.argv[1] + sys.argv[2] 
+# sd = Sdforlstm(path="stackrnn/sdata/", task=sys.argv[1] + '@' + sys.argv[2])
+
 #sd = Save_loss(path='stackrnn/sdata/', task=task)
 sdl = [sd] if sd is not None else []
 basic = {
     "batch_size": 100,
-    "epochs": 10,
-    "testfile_num": 2,
+    "epochs": 50,
+    "testfile_num": 5,
     "lr": 1e-3,
     "device": torch.device("cpu"),
     "verbose": False,
@@ -78,9 +80,9 @@ stackrnn = {
     'hidden_size': 2,
     "lr": 1e-3,
     "alpha": 0.002,
-    'customalization': True,
+    'customalization': False,
     'weight_decay': 0,
-    'bias_customalization': False,
+    'bias_customalization': True,
 }
 
 stacksrn = {
@@ -368,8 +370,8 @@ anbnlstmConfig = {
 
 anbnphlstmConfig = {
     "task_name": "anbn@phlstm",
-    "load_model": r"finaltrain_anbnphlstm",
-    'lr': 100,
+    "load_model": r"f_anbnphlstm_100100100716000",
+    'lr': 10,
     }
 
 append(anbnsrnConfig, basic, anbn, srn)
@@ -398,7 +400,7 @@ anbncnlstmConfig = {
 
 anbncnphlstmConfig = {
     "task_name": "anbncn@phlstm",
-    "load_model": r"anbncn@phlstm_1.00_0.00@0636",
+    "load_model": r"anbncn@phlstm_1.00_0.00@0854",
     'lr': 1e-3,
     }
 
@@ -427,7 +429,7 @@ dyck1lstmConfig = {
 
 dyck1phlstmConfig = {
     "task_name": "dyck1@phlstm",
-    "load_model": r"dyck1@phlstm_1.00_0.00@0827",
+    "load_model": r"f_dyck1phlstm_100100100100985",
     'lr': 1e-4,
     }
 append(dyck1srnConfig, basic, dyck1, srn)

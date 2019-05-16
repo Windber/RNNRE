@@ -144,7 +144,7 @@ class RNN(nn.Module):
                 tmp = self.hidden
             output = self.nonlinear(self.linear(tmp))
             for scb in self.callback:
-                scb.step_cb(self, self.hidden)
+                scb.step_cb(self, self.hidden, x[:, i, :])
             outputs.append(torch.unsqueeze(output, 1))
         outputs = torch.cat(outputs, 1)
         return outputs
