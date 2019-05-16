@@ -30,9 +30,9 @@ class Dyck2:
             rselect = rselect if len(self.Grammar.P[replace][rselect]) > 0 else 1- rselect
             replace = self.Grammar.P[replace][rselect][random.randint(0, len(self.Grammar.P[replace][rselect]) - 1)]
             cur = cur[:mat.start(0)] + replace + cur[mat.end(0):]
-            if len(cur) > 128:
-                p = p * 0.9
             if len(cur) > 510:
+                p = p * 0.9
+            if len(cur) > 32:
                 return 'secret'
         return cur
     def accept(self, s):
@@ -104,7 +104,7 @@ if __name__ == "__main__":
                    "T": [["()", "[]"], []]
                    },
                 prob=propab,
-                name="dyck2_",
+                name="../dyck2",
                 diction={0: "(",
                         1: ")",
                         2: "[",

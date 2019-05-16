@@ -5,7 +5,7 @@ from stackrnn.rnntask import RNNTask, RNN, PHLSTMCell, MyLSTMCell
 from stackrnn.nlfunction import *
 from stackrnn.stackrnncell import StackRNNCell
 from stackrnn.callback import Save_data, Sdforlstm, Save_loss
-
+import sys
 def append(ori, *dess):
     key = ori.keys()
     for des in dess:
@@ -17,14 +17,15 @@ sd = None
 sd = Sdforlstm(path="stackrnn/sdata/", task='anbn@phlstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
-task = 'anbn'  + 'lstm' 
+
+task = sys.argv[1] + sys.argv[2]
 #sd = Save_loss(path='stackrnn/sdata/', task=task)
 sdl = [sd] if sd is not None else []
 basic = {
     "batch_size": 100,
     "epochs": 50,
     "testfile_num": 5,
-    "lr": 1e-3,
+    "lr": 1e-1,
     "device": torch.device("cpu"),
     "verbose": False,
     "debug": False,
@@ -36,8 +37,8 @@ basic = {
     'callback': sdl,
     'load': True,
     'onlytest': False,
-    'load_last': True,
-
+    'load_last': False,
+    'weight_decay': 0,
     }
 
 rnn = {
@@ -71,8 +72,9 @@ stackrnn = {
     "read_size": 2,
     "n_args": 2,
     "lr": 1e-3,
-    "alpha": 0,
-}
+    "alpha": 0.0002,
+    'customalization': False,
+    }
 
 stacksrn = {
     "model_name": "stacksrn",
@@ -160,7 +162,7 @@ append(anbncn, cl)
 
 dyck1 = {
     "input_size": 4,
-    "hidden_size": 2,
+    "hidden_size": 3,
     "output_size": 3,
     "alphabet": {"(": [2], ")": [3], "s": [0], "e": [1]},
     "classes": {"1": [1, 0, 0], "3": [1, 1, 0], "6": [0, 1, 1]},
@@ -355,7 +357,7 @@ anbngruConfig = {
 
 anbnlstmConfig = {
     "task_name": "anbn@lstm",
-    "load_model": r"anbn@LSTM_1.00_0.80@1118",
+    "load_model": r"anbn@lstm_1.00_0.00@1318",
     }
 
 append(anbnsrnConfig, basic, anbn, srn)
@@ -377,8 +379,7 @@ anbncngruConfig = {
 
 anbncnlstmConfig = {
     "task_name": "anbncn@lstm",
-    "load_model": r"anbncn@LSTM_1.00_0.80@1118",
-    "load": False,
+    "load_model": r"anbncn@lstm_1.00_0.00@1559",
     }
 
 append(anbncnsrnConfig, basic, anbncn, srn)
@@ -399,8 +400,7 @@ dyck1gruConfig = {
 
 dyck1lstmConfig = {
     "task_name": "dyck1@lstm",
-    "load_model": r"dyck1@LSTM_1.00_0.80@1118",
-    "load": False,
+    "load_model": r"dyck1@lstm_1.00_0.00@1538",
     }
 
 append(dyck1srnConfig, basic, dyck1, srn)
@@ -432,7 +432,7 @@ append(dyck2lstmConfig, basic, dyck2, lstm)
 anbnstackgruConfig = {
     "task_name": "anbn@stackgru",     
     "load_model": r'anbn@stackgru_1.00_1.00@honey',
-    "load": True,
+    'hidden_size': 2,
             }
 
 anbncnstackgruConfig = {

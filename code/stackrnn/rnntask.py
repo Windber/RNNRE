@@ -68,7 +68,11 @@ class PHLSTMCell(nn.Module):
     def init(self):
         rnn_init_(self)
         amp = 2
-        self.bias_ih.data.add_(torch.tensor([-amp, -amp, -amp, amp, amp, amp, 0, 0, 0, -amp, -amp, -amp], dtype=torch.float32))
+        l = list()
+        for i in [-amp, amp, 0, -amp]:
+            for _ in range(self.hidden_size):
+                l.append(i)  
+        self.bias_ih.data.add_(torch.tensor(l, dtype=torch.float32))
 
     def forward(self, x, hc):
         h = hc[0]
