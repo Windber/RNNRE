@@ -31,9 +31,9 @@ class Dyck1:
             rselect = rselect if len(self.Grammar.P[replace][rselect]) > 0 else 1- rselect
             replace = self.Grammar.P[replace][rselect][random.randint(0, len(self.Grammar.P[replace][rselect]) - 1)]
             cur = cur[:mat.start(0)] + replace + cur[mat.end(0):]
-            if len(cur) > 384:
-                p = p * 0.9
             if len(cur) > 510:
+                p = p * 0.9
+            if len(cur) > 32:
                 return 'secret'
         return cur
     def accept(self, s):
@@ -73,7 +73,7 @@ class Dyck1:
         feature = f + 'e' * (p - length)
         label = l + ehex * (p - length)
         return feature, label
-propab = list(map(lambda x: min(0.6, max(0.4, x)),[random.random() for i in range(10)]))
+propab = list(map(lambda x: min(0.99, max(0.01, x)),[random.random() for i in range(10)]))
 second = True
 import sys
 d1 = Dyck1(V=["S", "A", "B", "C"],
@@ -85,7 +85,7 @@ d1 = Dyck1(V=["S", "A", "B", "C"],
                "C": [["()"], []]
                },
             prob=propab,
-            name="dyck1",
+            name="../dyck1",
             diction={0: "(",
                     1: ")",
                     }
