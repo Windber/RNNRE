@@ -24,8 +24,8 @@ class RNNController(nn.Module):
             linear_init_(self.fc_s1)
             linear_init_(self.fc_u)
             rnn_init_(self.rnn)
-            self.fc_u.bias.data.add_(torch.tensor(-1, dtype=torch.float32))
-            self.fc_s1.bias.data.add_(torch.tensor(1, dtype=torch.float32))
+            if self.bias_customalization:
+                self.fc_u.bias.data.add_(torch.tensor(-1, dtype=torch.float32))
             if self.customalization:
                 apm = 5
                 if self.data_name == 'anbn':
@@ -37,8 +37,6 @@ class RNNController(nn.Module):
                                                              dtype=torch.float32))
                     self.fc_s1.weight.data.add_(torch.tensor([0, 0, 0, 0, apm, -apm, apm, -apm],
                                                              dtype=torch.float32))
-                    self.rnn.weight_ih.data.add_(torch.tensor([[0, 0, 0, 0, apm, 0],
-                                                               [0, 0, 0, 0, 0, apm]], dtype=torch.float32))
                 elif self.data_name == 'dyck1':
                     self.fc_v2.weight.data.add_(torch.tensor([[0, 0, 0, 0, 0, 0, apm, 0],
                                                  [0, 0, 0, 0, 0, 0, 0, 0]], dtype=torch.float32))
@@ -48,8 +46,6 @@ class RNNController(nn.Module):
                                                              dtype=torch.float32))
                     self.fc_s1.weight.data.add_(torch.tensor([0, 0, 0, 0, apm, -apm, apm, -apm],
                                                              dtype=torch.float32))
-                    self.rnn.weight_ih.data.add_(torch.tensor([[0, 0, 0, 0, apm, 0],
-                                                               [0, 0, 0, 0, 0, 0]], dtype=torch.float32))
                 elif self.data_name == 'dyck2':
                     self.fc_v2.weight.data.add_(torch.tensor([[0, 0, 0, 0, 0, 0, apm, 0, 0, 0],
                                                               [0, 0, 0, 0, 0, 0, 0, 0, apm, 0]], dtype=torch.float32))
@@ -59,8 +55,6 @@ class RNNController(nn.Module):
                                                              dtype=torch.float32))
                     self.fc_s1.weight.data.add_(torch.tensor([0, 0, 0, 0, apm, -apm, apm, -apm, apm, -apm],
                                                              dtype=torch.float32))
-                    self.rnn.weight_ih.data.add_(torch.tensor([[0, 0, 0, 0, 0, 0, 0, 0],
-                                                               [0, 0, 0, 0, 0, 0, 0, 0]], dtype=torch.float32))
                     
     def __getattr__(self, name):
         if name in self.params:

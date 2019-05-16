@@ -68,7 +68,9 @@ class StackRNNTask(Task):
         ys = ys.view(-1, self.output_size)
         batch_loss = self.cel(yp, ys)
         stack_loss = self.cel(self.model.cell.stack._actual, torch.zeros(self.batch_size, 1))
-        batch_loss = (1 - self.alpha) * batch_loss + self.alpha * stack_loss
+        alpha = 0.01
+#         alpha = batch_loss.item() / (batch_loss.item() + stack_loss.item())
+        batch_loss = (1 - alpha) * batch_loss + alpha * stack_loss
         if istraining:
             self.optim.zero_grad()
             batch_loss.backward()

@@ -23,8 +23,8 @@ task = sys.argv[1] + sys.argv[2]
 sdl = [sd] if sd is not None else []
 basic = {
     "batch_size": 100,
-    "epochs": 50,
-    "testfile_num": 5,
+    "epochs": 10,
+    "testfile_num": 2,
     "lr": 1e-3,
     "device": torch.device("cpu"),
     "verbose": False,
@@ -37,7 +37,7 @@ basic = {
     'callback': sdl,
     'load': True,
     'onlytest': False,
-    'load_last': False,
+    'load_last': True,
 
     }
 
@@ -75,8 +75,12 @@ stackrnn = {
     'cell_class': StackRNNCell,
     "read_size": 2,
     "n_args": 2,
+    'hidden_size': 2,
     "lr": 1e-3,
-    "alpha": 0,
+    "alpha": 0.002,
+    'customalization': True,
+    'weight_decay': 0,
+    'bias_customalization': False,
 }
 
 stacksrn = {
@@ -165,7 +169,7 @@ append(anbncn, cl)
 
 dyck1 = {
     "input_size": 4,
-    "hidden_size": 2,
+    "hidden_size": 3,
     "output_size": 3,
     "alphabet": {"(": [2], ")": [3], "s": [0], "e": [1]},
     "classes": {"1": [1, 0, 0], "3": [1, 1, 0], "6": [0, 1, 1]},
@@ -180,7 +184,6 @@ cfl = {
 
 dyck2 = {
     "input_size": 6,
-    "hidden_size": 2,
     "output_size": 5,
     "alphabet": {"(": [2], ")": [3], "s": [0], "e": [1], '[': [4], ']': [5]},
     "classes": {"1": [1, 0, 0, 0, 0], "b": [1, 1, 0, 1, 0], "e": [0, 1, 1, 1, 0], '1a': [0, 1, 0, 1, 1]},
@@ -450,7 +453,7 @@ append(dyck2phlstmConfig, basic, dyck2, phlstm)
 
 anbnstackgruConfig = {
     "task_name": "anbn@stackgru",     
-    "load_model": r'anbn@stackgru_1.00_1.00@honey',
+    "load_model": r'finaltrain_anbnstackgru',
             }
 
 anbncnstackgruConfig = {
@@ -475,13 +478,11 @@ append(t4stackgruConfig, basic, t4, stackgru)
 dyck2stacksrnConfig = {
     "task_name": "dyck2@stacksrn",     
     "load_model": r'dyck2@stacksrn_1.00_0.00@0005',
-    'alpha': 0.002,
-    "customalization": True,
             }
 
 dyck2stackgruConfig = {
     "task_name": "dyck2@stackgru",     
-    "load_model": r'dyck2@stackgru_1.00_0.01@2216',
+    "load_model": r'dyck2@stackgru_0.99_0.03@1519',
             }
 
 dyck2stacklstmConfig = {
