@@ -24,7 +24,7 @@ class Task:
         self.trainx, self.trainy, self.testxl, self.testyl = self.get_data()
         if self.load:
             if self.load_last:
-                load_last = pickle.load(open('finaltrain', 'rb'))
+                load_last = pickle.load(open('finaltrain' + self.task_name, 'rb'))
                 load_model = load_last
             else:
                 load_model = self.load_path + self.load_model
@@ -73,7 +73,7 @@ class Task:
         save_model = self.saved_path + "/" + self.task_name + "_%.2f_%.2f" % (self.maxaccuracy, self.minloss) + "@" + time.strftime("%H%M")
         torch.save([self.state, self.minloss, self.maxaccuracy], 
                    save_model)
-        pickle.dump(save_model, open('finaltrain', 'wb'))
+        pickle.dump(save_model, open('finaltrain' + self.task_name, 'wb'))
         for eecb in self.callback:
             eecb.eepoch_cb(self)
     def perepoch(self, ex, ey, e, istraining):

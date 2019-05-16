@@ -52,9 +52,13 @@ gru = {
 
 lstm = {
     "model_name": "LSTM",
-    "cell_class": PHLSTMCell,
+    "cell_class": nn.LSTMCell,
     }
 
+phlstm = {
+    "model_name": "PHLSTM",
+    "cell_class": PHLSTMCell,
+    }
 srn = {
     "model_name": "SRN",
     "cell_class": nn.RNNCell,
@@ -63,7 +67,7 @@ srn = {
 append(srn, rnn)
 append(gru, rnn)
 append(lstm, rnn)
-
+append(phlstm, rnn)
 stackrnn = {
     "task_class": StackRNNTask,
     "model_class": StackRNN,
@@ -358,9 +362,15 @@ anbnlstmConfig = {
     "load_model": r"anbn@LSTM_1.00_0.80@1118",
     }
 
+anbnphlstmConfig = {
+    "task_name": "anbn@phlstm",
+    "load_model": r"anbn@LSTM_1.00_0.80@1118",
+    }
+
 append(anbnsrnConfig, basic, anbn, srn)
 append(anbngruConfig, basic, anbn, gru)
 append(anbnlstmConfig, basic, anbn, lstm)
+append(anbnphlstmConfig, basic, anbn, phlstm)
 
 
 anbncnsrnConfig = {
@@ -381,9 +391,15 @@ anbncnlstmConfig = {
     "load": False,
     }
 
+anbncnphlstmConfig = {
+    "task_name": "anbncn@phlstm",
+    "load_model": r"anbncn@LSTM_1.00_0.80@1118",
+    }
+
 append(anbncnsrnConfig, basic, anbncn, srn)
 append(anbncngruConfig, basic, anbncn, gru)
 append(anbncnlstmConfig, basic, anbncn, lstm)
+append(anbncnphlstmConfig, basic, anbncn, phlstm)
 
 dyck1srnConfig = {
     "task_name": "dyck1@srn",
@@ -403,54 +419,52 @@ dyck1lstmConfig = {
     "load": False,
     }
 
+dyck1phlstmConfig = {
+    "task_name": "dyck1@phlstm",
+    "load_model": r"dyck1@LSTM_1.00_0.80@1118",
+    }
 append(dyck1srnConfig, basic, dyck1, srn)
 append(dyck1gruConfig, basic, dyck1, gru)
-append(dyck1lstmConfig, basic, dyck1, lstm)
+append(dyck1phlstmConfig, basic, dyck1, phlstm)
 
 dyck2srnConfig = {
     "task_name": "dyck2@srn",
     "load_model": r"dyck2@LSTM_1.00_0.80@1118",
-    "load": False,
     }
 
 dyck2gruConfig = {
     "task_name": "dyck2@gru",
     "load_model": r"dyck2@LSTM_1.00_0.80@1118",
-    "load": False,
     }
 
-dyck2lstmConfig = {
-    "task_name": "dyck2@lstm",
+dyck2phlstmConfig = {
+    "task_name": "dyck2@phlstm",
     "load_model": r"dyck2@LSTM_1.00_0.80@1118",
-    "load": False,
     }
 
 append(dyck2srnConfig, basic, dyck2, srn)
 append(dyck2gruConfig, basic, dyck2, gru)
-append(dyck2lstmConfig, basic, dyck2, lstm)
+append(dyck2phlstmConfig, basic, dyck2, phlstm)
+
 
 anbnstackgruConfig = {
     "task_name": "anbn@stackgru",     
     "load_model": r'anbn@stackgru_1.00_1.00@honey',
-    "load": True,
             }
 
 anbncnstackgruConfig = {
     "task_name": "anbncn@stackgru",     
     "load_model": r'anbncn@stackgru_1.00_1.00@honey',
-    "load": True,
             }
 
 dyck1stackgruConfig = {
     "task_name": "dyck1@stackgru",     
     "load_model": r'dyck1@stackgru_1.00_1.00@honey',
-    "load": True,
             }
 
 t4stackgruConfig = {
     "task_name": "t4@stackgru",     
     "load_model": r't4@stackgru_1.00_1.00@honey',
-    "load": True,
             }
 append(anbnstackgruConfig, basic, anbn, stackgru)
 append(anbncnstackgruConfig, basic, anbncn, stackgru)
