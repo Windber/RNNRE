@@ -113,10 +113,7 @@ class RNN(nn.Module):
     def __init__(self, params):
         super().__init__()
         self.params = params
-        if self.model_name == 'LSTM':
-            self.cell = self.cell_class(self.input_size, self.hidden_size)
-        else:
-            self.cell = self.cell_class(self.input_size, self.hidden_size)
+        self.cell = self.cell_class(self.input_size, self.hidden_size)
         self.hidden = None
         self.linear = nn.Linear(self.hidden_size, self.output_size)
         self.nonlinear = nn.Sigmoid()
@@ -139,7 +136,7 @@ class RNN(nn.Module):
         outputs = list()
         for i in range(timestep):
             
-            if self.model_name == 'LSTM':
+            if self.model_name == 'LSTM' or self.model_name == 'PHLSTM':
                 self.hidden = self.cell(x[:, i, :], self.hidden)
                 tmp = self.hidden[0]
             else:
