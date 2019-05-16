@@ -369,6 +369,7 @@ anbnlstmConfig = {
 anbnphlstmConfig = {
     "task_name": "anbn@phlstm",
     "load_model": r"finaltrain_anbnphlstm",
+    'lr': 100,
     }
 
 append(anbnsrnConfig, basic, anbn, srn)
@@ -397,7 +398,8 @@ anbncnlstmConfig = {
 
 anbncnphlstmConfig = {
     "task_name": "anbncn@phlstm",
-    "load_model": r"finaltrain_anbncnphlstm",
+    "load_model": r"anbncn@phlstm_1.00_0.00@0636",
+    'lr': 1e-3,
     }
 
 append(anbncnsrnConfig, basic, anbncn, srn)
@@ -425,7 +427,8 @@ dyck1lstmConfig = {
 
 dyck1phlstmConfig = {
     "task_name": "dyck1@phlstm",
-    "load_model": r"finaltrain_dyck1phlstm",
+    "load_model": r"dyck1@phlstm_1.00_0.00@0827",
+    'lr': 1e-4,
     }
 append(dyck1srnConfig, basic, dyck1, srn)
 append(dyck1gruConfig, basic, dyck1, gru)
