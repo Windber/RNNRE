@@ -165,7 +165,7 @@ append(anbncn, cl)
 
 dyck1 = {
     "input_size": 4,
-    "hidden_size": 2,
+    "hidden_size": 3,
     "output_size": 3,
     "alphabet": {"(": [2], ")": [3], "s": [0], "e": [1]},
     "classes": {"1": [1, 0, 0], "3": [1, 1, 0], "6": [0, 1, 1]},
@@ -366,6 +366,7 @@ anbnlstmConfig = {
 anbnphlstmConfig = {
     "task_name": "anbn@phlstm",
     "load_model": r"finaltrain_anbnphlstm",
+    'lr': 100,
     }
 
 append(anbnsrnConfig, basic, anbn, srn)
@@ -394,7 +395,8 @@ anbncnlstmConfig = {
 
 anbncnphlstmConfig = {
     "task_name": "anbncn@phlstm",
-    "load_model": r"finaltrain_anbncnphlstm",
+    "load_model": r"anbncn@phlstm_1.00_0.00@0636",
+    'lr': 1e-3,
     }
 
 append(anbncnsrnConfig, basic, anbncn, srn)
@@ -422,7 +424,8 @@ dyck1lstmConfig = {
 
 dyck1phlstmConfig = {
     "task_name": "dyck1@phlstm",
-    "load_model": r"finaltrain_dyck1phlstm",
+    "load_model": r"dyck1@phlstm_1.00_0.00@0827",
+    'lr': 1e-4,
     }
 append(dyck1srnConfig, basic, dyck1, srn)
 append(dyck1gruConfig, basic, dyck1, gru)
