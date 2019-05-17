@@ -51,9 +51,10 @@ class Sdforlstm(Save_data):
     def step_cb(self, model, *args):
         h = args[0][0].detach().numpy()
         c = args[0][1].detach().numpy()
+        x = args[1].detach().numpy()
         batch_size = model.batch_size
         element_size = 0
-        li = [h, c]
+        li = [h, c, x]
         for i in li:
             tmp = i.shape[1] if len(i.shape) > 1 else 1
             element_size += tmp
