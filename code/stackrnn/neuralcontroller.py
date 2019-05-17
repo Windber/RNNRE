@@ -24,9 +24,9 @@ class RNNController(nn.Module):
             linear_init_(self.fc_s1)
             linear_init_(self.fc_u)
             rnn_init_(self.rnn)
-            if self.bias_customalization:
-                self.fc_u.bias.data.add_(torch.tensor(-1, dtype=torch.float32))
-            if self.customalization:
+            if self.addubias:
+                self.fc_u.bias.data.add_(torch.tensor(self.ubias, dtype=torch.float32))
+            if self.customization:
                 apm = 5
                 if self.data_name == 'anbn':
                     self.fc_v2.weight.data.add_(torch.tensor([[0, 0, 0, 0, 0, 0, apm, 0],
