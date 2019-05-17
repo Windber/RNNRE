@@ -21,7 +21,11 @@ class StackRNN(nn.Module):
         outputs = list()
         for i in range(steps):
             self.hidden, self.read = self.cell(x[:, i, :], self.hidden, self.read)
-            output = self.nl(self.o_linear(torch.cat([self.hidden, self.read, self.cell.stack._actual], 1)))
+            if self.model_name.endswith('lstm'):
+                onlyh = self.hidden[0]
+            else:
+                onlyh = self.hidden
+            output = self.nl(self.o_linear(torch.cat([onlyh, self.read, self.cell.stack._actual], 1)))
             outputs.append(torch.unsqueeze(output, 1))
             for scb in self.callback:
                 scb.step_cb(self.cell, x[:, i, :], output, self.read, self.hidden)
@@ -32,7 +36,11 @@ class StackRNN(nn.Module):
     
     def init(self):
         self.read = torch.zeros(self.batch_size, self.read_size).to(self.device)
-        self.hidden = torch.zeros((self.batch_size, self.hidden_size)).to(self.device)
+        if self.model_name.endswith('lstm'):
+            self.hidden = (torch.zeros(self.batch_size, self.hidden_size).to(self.device), 
+                           torch.zeros(self.batch_size, self.hidden_size).to(self.device))
+        else:
+            self.hidden = torch.zeros((self.batch_size, self.hidden_size)).to(self.device)
         
         self.cell.stack._values = list()
         self.cell.stack._S = list()

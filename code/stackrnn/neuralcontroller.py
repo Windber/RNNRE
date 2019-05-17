@@ -63,7 +63,11 @@ class RNNController(nn.Module):
             return super().__getattr__(name)
     def forward(self, x, h, r):
         ri = torch.cat([r, x], dim=1)
-        qri = torch.cat([h, ri], dim=1)
+        if self.model_name.endswith('lstm'):
+            onlyh = h[0]
+        else:
+            onlyh = h
+        qri = torch.cat([onlyh, ri], dim=1)
         
         s1 = self.sigmoid(self.fc_s1(qri))
         u = self.sigmoid(self.fc_u(qri))
