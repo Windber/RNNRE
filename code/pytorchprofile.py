@@ -14,15 +14,7 @@ def append(ori, *dess):
                 ori[k] = des[k]
                 
 import sys
-sd = None
-# sd = Sdforlstm(path="stackrnn/sdata/", task='dyck1@phlstm')
-# sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
-# sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 task = sys.argv[1] + sys.argv[2] 
-# sd = Sdforlstm(path="stackrnn/sdata/", task=sys.argv[1] + '@' + sys.argv[2])
-
-#sd = Save_loss(path='stackrnn/sdata/', task=task)
-sdl = [sd] if sd is not None else []
 basic = {
     "batch_size": 100,
     "epochs": 50,
@@ -36,7 +28,7 @@ basic = {
     'validate': False,
     "load_path": r"stackrnn/smodel/",
     "saved_path": r"stackrnn/smodel/",
-    'callback': sdl,
+    'callback': list(),
     'load': False,
     'onlytest': False,
     'load_last': False,
@@ -51,9 +43,21 @@ elif sys.argv[3] == 'testlast':
     basic['load'] = True
     basic['load_last'] = True
     basic['onlytest'] = True
+    basic['callback'].append()
+# sd = Sdforlstm(path="stackrnn/sdata/", task='dyck1@phlstm')
+# sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
+# sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
+# sd = Sdforlstm(path="stackrnn/sdata/", task=sys.argv[1] + '@' + sys.argv[2])
+# sd = Save_loss(path='stackrnn/sdata/', task=task)
 elif sys.argv[3] == 'testspec':
     basic['load'] = True
     basic['onlytest'] = True
+    basic['callback'].append()
+# sd = Sdforlstm(path="stackrnn/sdata/", task='dyck1@phlstm')
+# sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
+# sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
+# sd = Sdforlstm(path="stackrnn/sdata/", task=sys.argv[1] + '@' + sys.argv[2])
+# sd = Save_loss(path='stackrnn/sdata/', task=task)
 elif sys.argv[3] == 'loadspec':
     basic['load'] == True
 
