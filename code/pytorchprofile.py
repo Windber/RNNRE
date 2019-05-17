@@ -98,10 +98,12 @@ stackrnn = {
     "n_args": 2,
     'hidden_size': 2,
     "lr": 1e-3,
-    "alpha": 0.002,
-    'customalization': False,
+    "alpha": 0.01,
+    'addstackloss': True,
+    'customization': False,
+    'addubias': True,
+    'ubias': -1,
     'weight_decay': 0,
-    'bias_customalization': True,
 }
 
 stacksrn = {
