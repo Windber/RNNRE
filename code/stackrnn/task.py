@@ -70,7 +70,7 @@ class Task:
                 save_model = self.saved_path + self.task_name + "_%.2f_%.2f" % (self.maxaccuracy, self.minloss) + "@" + time.strftime("%H%M")
                 torch.save([self.state, self.minloss, self.maxaccuracy], 
                            save_model)
-        save_model = self.saved_path + "/" + self.task_name + "_%.2f_%.2f" % (self.maxaccuracy, self.minloss) + "@" + time.strftime("%H%M")
+        save_model = self.saved_path  + self.task_name + "_%.2f_%.2f" % (self.maxaccuracy, self.minloss) + "@" + time.strftime("%H%M")
         torch.save([self.state, self.minloss, self.maxaccuracy], 
                    save_model)
         pickle.dump(save_model, open('finaltrain' + self.task_name, 'wb'))

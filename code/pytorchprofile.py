@@ -17,8 +17,8 @@ import sys
 task = sys.argv[1] + sys.argv[2] 
 basic = {
     "batch_size": 100,
-    "epochs": 50,
-    "testfile_num": 5,
+    "epochs": 10,
+    "testfile_num": 3,
     "lr": 1e-3,
     "device": torch.device("cpu"),
     "verbose": False,
@@ -59,7 +59,7 @@ elif sys.argv[3] == 'testspec':
 # sd = Sdforlstm(path="stackrnn/sdata/", task=sys.argv[1] + '@' + sys.argv[2])
 # sd = Save_loss(path='stackrnn/sdata/', task=task)
 elif sys.argv[3] == 'loadspec':
-    basic['load'] == True
+    basic['load'] = True
 
 
 rnn = {
@@ -205,6 +205,7 @@ cfl = {
 
 dyck2 = {
     "input_size": 6,
+    'hidden_size': 4,
     "output_size": 5,
     "alphabet": {"(": [2], ")": [3], "s": [0], "e": [1], '[': [4], ']': [5]},
     "classes": {"1": [1, 0, 0, 0, 0], "b": [1, 1, 0, 1, 0], "e": [0, 1, 1, 1, 0], '1a': [0, 1, 0, 1, 1]},
@@ -214,7 +215,6 @@ append(dyck2, cfl)
 
 t1srnConfig = {
     "task_name": "t1@srn",
-    "load": False,
     "load_model": r"t1@srn_0.03_0.01@1322",
             }
 
@@ -222,7 +222,6 @@ append(t1srnConfig, basic, t1, srn)
 
 t1gruConfig = {
     "task_name": "t1@GRU",
-    "load": False,
     "load_model": r"t1@GRU_0.03_0.01@1322",
             }
 
@@ -237,7 +236,6 @@ append(t1lstmConfig, basic, t1, lstm)
 
 t2srnConfig = {
     "task_name": "t2@srn",
-    "load": False,
     "load_model": r"t2@srn_0.03_0.01@1322",
             }
 
@@ -245,7 +243,6 @@ append(t2srnConfig, basic, t2, srn)
 
 t2gruConfig = {
     "task_name": "t2@GRU",
-    "load": False,
     "load_model": r"t2@GRU_0.03_0.01@1322",
             }
 
@@ -253,7 +250,6 @@ append(t2gruConfig, basic, t2, gru)
 
 t2lstmConfig = {
     "task_name": "t2@LSTM",
-    "load": False,
     "load_model": r"t2@LSTM_0.03_0.01@1322",
             }
 
@@ -261,7 +257,6 @@ append(t2lstmConfig, basic, t2, lstm)
 
 t3srnConfig = {
     "task_name": "t3@srn",
-    "load": False,
     "load_model": r"t3@srn_0.03_0.01@1322",
             }
 
@@ -269,14 +264,12 @@ append(t3srnConfig, basic, t3, srn)
 
 t3gruConfig = {
     "task_name": "t3@GRU",
-    "load": False,
     "load_model": r"t3@GRU_0.03_0.01@1322",
             }
 append(t3gruConfig, basic, t3, gru)
 
 t3lstmConfig = {
     "task_name": "t3@LSTM",
-    "load": False,
     "load_model": r"t3@LSTM_0.03_0.01@1322",
             }
 
@@ -284,7 +277,6 @@ append(t3lstmConfig, basic, t3, lstm)
 
 t4srnConfig = {
     "task_name": "t4@srn",
-    "load": False,
     "load_model": r"t4@srn_0.03_0.01@1322",
             }
 
@@ -292,7 +284,6 @@ append(t4srnConfig, basic, t4, srn)
 
 t4gruConfig = {
     "task_name": "t4@GRU",
-    "load": False,
     "load_model": r"t4@GRU_0.03_0.01@1322",
             }
 
@@ -300,7 +291,6 @@ append(t4gruConfig, basic, t4, gru)
 
 t4lstmConfig = {
     "task_name": "t4@LSTM",
-    "load": False,
     "load_model": r"t4@LSTM_0.03_0.01@1322",
             }
 
@@ -308,64 +298,53 @@ append(t4lstmConfig, basic, t4, lstm)
 
 t5srnConfig = {
     "task_name": "t5@srn",
-    "load": False,
     "load_model": r"t5@srn_0.03_0.01@1322",
             }
 append(t5srnConfig, basic, t5, srn)
 
 t5gruConfig = {
     "task_name": "t5@GRU",
-    "load": False,
     "load_model": r"t5@GRU_0.03_0.01@1322",
             }
 append(t5gruConfig, basic, t5, gru)
 
 t5lstmConfig = {
     "task_name": "t5@LSTM",
-    "load": False,
     "load_model": r"t5@LSTM_0.03_0.01@1322",
             }
 append(t5lstmConfig, basic, t5, lstm)
 
 t6srnConfig = {
     "task_name": "t6@srn",
-    "load": False,
     "load_model": r"t6@srn_0.03_0.01@1322",
             }
 append(t6srnConfig, basic, t6, srn)
 
 t6gruConfig = {
     "task_name": "t6@GRU",
-    "load": False,
     "load_model": r"t6@GRU_0.03_0.01@1322",
             }
 append(t6gruConfig, basic, t6, gru)
 
 t6lstmConfig = {
     "task_name": "t6@LSTM",
-    "load": False,
-    'onlytest': True,
-    "load_model": r"t6@LSTM_0.03_0.01@1322",
-            }
-append(t6lstmConfig, basic, t6, lstm)
-
-t7srnConfig = {
-    "task_name": "t7@srn",
-    "load": False,
     "load_model": r"t7@srn_0.03_0.01@1322",
             }
+t7srnConfig = {
+            "task_name": "t7@SRN",
+            "load_model": r"t7@SRN_0.03_0.01@1322",
+                            }
+
 append(t7srnConfig, basic, t7, srn)
 
 t7gruConfig = {
     "task_name": "t7@GRU",
-    "load": False,
     "load_model": r"t7@GRU_0.03_0.01@1322",
             }
 append(t7gruConfig, basic, t7, gru)
 
 t7lstmConfig = {
     "task_name": "t7@LSTM",
-    "load": False,
     "load_model": r"t7@LSTM_0.03_0.01@1322",
             }
 append(t7lstmConfig, basic, t7, lstm)
@@ -373,6 +352,7 @@ append(t7lstmConfig, basic, t7, lstm)
 anbnsrnConfig = {
     "task_name": "anbn@srn",
     "load_model": r"anbn@LSTM_1.00_0.80@1118",
+    'lr': 5 * 1e-4,
     }
 
 anbngruConfig = {
@@ -401,26 +381,26 @@ append(anbnphlstmConfig, basic, anbn, phlstm)
 
 anbncnsrnConfig = {
     "task_name": "anbncn@srn",
-    "load_model": r"anbncn@LSTM_1.00_0.80@1118",
-    "load": False,
+    "load_model": r"anbncn@srn_1.00_0.02@1216",
+    'lr': 1e-4,
     }
 
 anbncngruConfig = {
     "task_name": "anbncn@gru",
     "load_model": r"anbncn@LSTM_1.00_0.80@1118",
-    "load": False,
+    'lr': 1e-2,
     }
 
 anbncnlstmConfig = {
     "task_name": "anbncn@lstm",
     "load_model": r"anbncn@LSTM_1.00_0.80@1118",
+    'lr': 1e-1,
     }
 
 anbncnphlstmConfig = {
     "task_name": "anbncn@phlstm",
     "load_model": r"f_anbncnphlstm_100100000000000",
     'lr':  1e-3,
-    'hidden_size': 6,
     }
 
 append(anbncnsrnConfig, basic, anbncn, srn)
@@ -459,7 +439,6 @@ append(dyck1phlstmConfig, basic, dyck1, phlstm)
 dyck2srnConfig = {
     "task_name": "dyck2@srn",
     "load_model": r"dyck2@LSTM_1.00_0.80@1118",
-    'hidden_size': 4,
     'lr': 1e-4,
     }
 
@@ -472,8 +451,7 @@ dyck2gruConfig = {
 dyck2phlstmConfig = {
     "task_name": "dyck2@phlstm",
     "load_model": r"dyck2@LSTM_1.00_0.80@1118",
-    'hidden_size': 4,
-    'lr': 1e-2,
+    'lr': 1e-3,
     }
 
 append(dyck2srnConfig, basic, dyck2, srn)
@@ -484,6 +462,7 @@ append(dyck2phlstmConfig, basic, dyck2, phlstm)
 anbnstackgruConfig = {
     "task_name": "anbn@stackgru",     
     "load_model": r'finaltrain_anbnstackgru',
+    'lr':5 * 1e-4,
             }
 
 anbncnstackgruConfig = {
@@ -507,18 +486,22 @@ append(t4stackgruConfig, basic, t4, stackgru)
 
 dyck2stacksrnConfig = {
     "task_name": "dyck2@stacksrn",     
-    "load_model": r'dyck2@stacksrn_1.00_0.00@0005',
+    "load_model": r'dyck2@stacksrn_1.00_0.00@1147',
+    'hidden_size': 2,
+    'lr': 5 * 1e-3,
             }
 
 dyck2stackgruConfig = {
     "task_name": "dyck2@stackgru",     
     "load_model": r'dyck2@stackgru_1.00_0.00@1218',
     'lr': 1e-4,
+    'hidden_size': 2,
             }
 
 dyck2stackphlstmConfig = {
     "task_name": "dyck2@stackphlstm",     
     "load_model": r'dyck2@stackphlstm_1.00_0.01@2216',
+    'hidden_size': 2
             }
 
 append(dyck2stacksrnConfig, basic, dyck2, stacksrn)
