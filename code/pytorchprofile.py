@@ -4,7 +4,7 @@ from stackrnn.stackrnntask import StackRNNTask, StackRNN
 from stackrnn.rnntask import RNNTask, RNN, PHLSTMCell, MyLSTMCell
 from stackrnn.nlfunction import *
 from stackrnn.stackrnncell import StackRNNCell
-from stackrnn.callback import Save_data, Sdforlstm, Save_loss
+from stackrnn.callback import Save_data, Sdforlstm, Save_loss,Sdforstacksrn
 
 def append(ori, *dess):
     key = ori.keys()
@@ -16,16 +16,16 @@ def append(ori, *dess):
 import sys
 sd = None
 # sd = Sdforlstm(path="stackrnn/sdata/", task='anbn@phlstm')
-# sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
+# sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@gru')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 task = sys.argv[1] + sys.argv[2] 
 #sd = Save_loss(path='stackrnn/sdata/', task=task)
 sdl = [sd] if sd is not None else []
 basic = {
-    "batch_size": 100,
-    "epochs": 20,
-    "testfile_num": 2,
-    "lr": 1e-1,
+    "batch_size": 30,
+    "epochs": 50,
+    "testfile_num": 3,
+    "lr": 1e-5,
     "device": torch.device("cpu"),
     "verbose": False,
     "debug": False,
@@ -36,8 +36,8 @@ basic = {
     "saved_path": r"stackrnn/smodel/",
     'callback': sdl,
     'load': True,
-    'onlytest': True,
-    'load_last': False,
+    'onlytest': False,
+    'load_last': True,
 
     }
 
@@ -485,7 +485,7 @@ dyck2stacksrnConfig = {
 
 dyck2stackgruConfig = {
     "task_name": "dyck2@stackgru",     
-    "load_model": r'dyck2@stackgru_0.88_0.20@1018',
+    "load_model": r'dyck2@stackgru_1.00_0.00@0313',
             }
 
 dyck2stacklstmConfig = {

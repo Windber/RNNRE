@@ -74,7 +74,7 @@ class StackRNNTask(Task):
         if istraining:
             self.optim.zero_grad()
             batch_loss.backward()
-            torch.nn.utils.clip_grad_value_(self.model.parameters(), 10)
+            #torch.nn.utils.clip_grad_value_(self.model.parameters(), 10)
             self.optim.step()
         if self.verbose:
             print("Train batch %d Loss: %f Accuracy: %f" % (bn, batch_loss / total, correct / total))
