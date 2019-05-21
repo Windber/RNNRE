@@ -477,7 +477,7 @@ append(t4stacksrnConfig, basic, t4, stacksrn)
 
 dyck2stacksrnConfig = {
     "task_name": "dyck2@stacksrn",     
-    "load_model": r'dyck2@stacksrn_1.00_0.00@2307',
+    "load_model": r'dyck2@stacksrn_1.00_0.00@0409',
     'hidden_size': 2,
     'lr': 5 * 1e-3,
             }
