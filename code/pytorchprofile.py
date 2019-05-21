@@ -18,7 +18,7 @@ task = sys.argv[1] + sys.argv[2]
 basic = {
     "batch_size": 100,
     "epochs": 10,
-    "testfile_num": 3,
+    "testfile_num": 5,
     "lr": 1e-3,
     "device": torch.device("cpu"),
     "verbose": False,
@@ -34,6 +34,15 @@ basic = {
     'load_last': False,
 
     }
+
+# sd = Sdforlstm(path="stackrnn/sdata/", task='dyck1@phlstm')
+sdstacksrn = Sdforstacksrn(path="stackrnn/sdata/", task=task)
+sdlstm = Sdforlstm(path="stackrnn/sdata/", task=task)
+sdloss = Save_loss(path='stackrnn/sdata/', task=task)
+
+if len(sys.argv) > 4:
+    basic['callback'].append(eval(sys.argv[4]))
+
 if sys.argv[3] == 'new':
     pass
 elif sys.argv[3] == 'loadlast':
@@ -43,16 +52,20 @@ elif sys.argv[3] == 'testlast':
     basic['load'] = True
     basic['load_last'] = True
     basic['onlytest'] = True
-    basic['callback'].append()
+    basic['batch_size'] = 100
+    basic['testfile_num'] = 5
+
 # sd = Sdforlstm(path="stackrnn/sdata/", task='dyck1@phlstm')
-# sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
-# sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
+#    sd = Sdforstacksrn(path="stackrnn/sdata/", task=task)
 # sd = Sdforlstm(path="stackrnn/sdata/", task=sys.argv[1] + '@' + sys.argv[2])
-# sd = Save_loss(path='stackrnn/sdata/', task=task)
+#    sd = Save_loss(path='stackrnn/sdata/', task=task)
+#    basic['callback'].append(sd)
 elif sys.argv[3] == 'testspec':
     basic['load'] = True
     basic['onlytest'] = True
-    basic['callback'].append()
+#    basic['callback'].append()
+    basic['batch_size'] = 100
+    basic['testfile_num'] = 5
 # sd = Sdforlstm(path="stackrnn/sdata/", task='dyck1@phlstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
@@ -60,6 +73,7 @@ elif sys.argv[3] == 'testspec':
 # sd = Save_loss(path='stackrnn/sdata/', task=task)
 elif sys.argv[3] == 'loadspec':
     basic['load'] = True
+
 
 
 rnn = {
@@ -116,6 +130,11 @@ stackgru = {
     'controller_cell_class': nn.GRUCell,
     }
 
+stacklstm = {
+            "model_name": "stacklstm",
+                'controller_cell_class': nn.LSTMCell,
+                    }
+
 stackphlstm = {
     "model_name": "stackphlstm",
     'controller_cell_class': PHLSTMCell,
@@ -124,6 +143,8 @@ stackphlstm = {
 append(stacksrn, stackrnn)
 append(stackgru, stackrnn)
 append(stackphlstm, stackrnn)
+append(stacklstm, stackrnn)
+
 
 tomita = {
     "input_size": 4,
@@ -441,7 +462,7 @@ append(dyck1phlstmConfig, basic, dyck1, phlstm)
 dyck2srnConfig = {
     "task_name": "dyck2@srn",
     "load_model": r"dyck2@LSTM_1.00_0.80@1118",
-    'lr': 1e-4,
+#    'lr': 1e-4,
     }
 
 dyck2gruConfig = {
@@ -450,21 +471,54 @@ dyck2gruConfig = {
     'lr': 1e-4,
     }
 
+dyck2lstmConfig = {
+            "task_name": "dyck2@lstm",
+                "load_model": r"dyck2@LSTM_1.00_0.80@1118",
+                'lr': 5*1e-4,
+                        }
+
 dyck2phlstmConfig = {
     "task_name": "dyck2@phlstm",
     "load_model": r"dyck2@LSTM_1.00_0.80@1118",
-    'lr': 1e-3,
     }
 
 append(dyck2srnConfig, basic, dyck2, srn)
 append(dyck2gruConfig, basic, dyck2, gru)
+append(dyck2lstmConfig, basic, dyck2, lstm)
 append(dyck2phlstmConfig, basic, dyck2, phlstm)
+
+anbnstacksrnConfig = {
+            "task_name": "anbn@stacksrn",
+                "load_model": r'anbn@stacksrn_1.00_0.00@0218',
+                    'lr': 1e-3,
+                                }
+
+anbncnstacksrnConfig = {
+            "task_name": "anbncn@stacksrn",
+                "load_model": r'anbncn@stacksrn_0.91_0.10@1031',
+                'lr': 5 * 1e-5,
+                            }
+
+dyck1stacksrnConfig = {
+            "task_name": "dyck1@stacksrn",
+                "load_model": r'finaltrain_dyck1stacksrn',
+                    'lr': 5 * 1e-4,
+                                }
+
+t4stacksrnConfig = {
+            "task_name": "t4@stacksrn",
+                "load_model": r't4@stacksrn_1.00_1.00@honey',
+                            }
+append(anbnstacksrnConfig, basic, anbn, stacksrn)
+append(anbncnstacksrnConfig, basic, anbncn, stacksrn)
+append(dyck1stacksrnConfig, basic, dyck1, stacksrn)
+append(t4stacksrnConfig, basic, t4, stacksrn)
 
 
 anbnstackgruConfig = {
     "task_name": "anbn@stackgru",     
-    "load_model": r'finaltrain_anbnstackgru',
-    'lr':5 * 1e-4,
+    "load_model": r'dyck2@stackgru_0.86_0.37@1039',
+    'lr':1e-4,
             }
 
 anbncnstackgruConfig = {
@@ -475,6 +529,7 @@ anbncnstackgruConfig = {
 dyck1stackgruConfig = {
     "task_name": "dyck1@stackgru",     
     "load_model": r'dyck1@stackgru_1.00_1.00@honey',
+    'lr': 5 * 1e-3,
             }
 
 t4stackgruConfig = {
@@ -488,16 +543,23 @@ append(t4stackgruConfig, basic, t4, stackgru)
 
 dyck2stacksrnConfig = {
     "task_name": "dyck2@stacksrn",     
-    "load_model": r'dyck2@stacksrn_1.00_0.00@1147',
+    "load_model": r'dyck2@stacksrn_1.00_0.00@1432',
     'hidden_size': 2,
-    'lr': 5 * 1e-3,
+    'lr': 1e-2,
             }
 
 dyck2stackgruConfig = {
     "task_name": "dyck2@stackgru",     
-    "load_model": r'dyck2@stackgru_1.00_0.00@1218',
-    'lr': 1e-4,
+    "load_model": r'dyck2@stackgru_0.86_0.37@1039',
+#    'lr': 1e-4,
     'hidden_size': 2,
+            }
+
+dyck2stacklstmConfig = {
+            "task_name": "dyck2@stacklstm",
+            "load_model": r'dyck2@stackphlstm_1.00_0.01@2216',
+            'hidden_size': 2,
+            'lr': 1e-5,
             }
 
 dyck2stackphlstmConfig = {
@@ -509,6 +571,7 @@ dyck2stackphlstmConfig = {
 append(dyck2stacksrnConfig, basic, dyck2, stacksrn)
 append(dyck2stackgruConfig, basic, dyck2, stackgru)
 append(dyck2stackphlstmConfig, basic, dyck2, stackphlstm)
+append(dyck2stacklstmConfig, basic, dyck2, stacklstm)
 
 if __name__ == "__main__":
             config_dict = eval( task + 'Config')
