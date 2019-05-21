@@ -17,8 +17,8 @@ import sys
 task = sys.argv[1] + sys.argv[2] 
 basic = {
     "batch_size": 100,
-    "epochs": 10,
-    "testfile_num": 3,
+    "epochs": 30,
+    "testfile_num": 5,
     "lr": 1e-3,
     "device": torch.device("cpu"),
     "verbose": False,
@@ -34,34 +34,38 @@ basic = {
     'load_last': False,
 
     }
+
+sd = None
 if sys.argv[3] == 'new':
-    pass
+    sd = Save_loss(path='stackrnn/sdata/', task=task, mode='wb')    
 elif sys.argv[3] == 'loadlast':
     basic['load'] = True
     basic['load_last'] = True
+    sd = Save_loss(path='stackrnn/sdata/', task=task, mode='ab')
 elif sys.argv[3] == 'testlast':
     basic['load'] = True
     basic['load_last'] = True
     basic['onlytest'] = True
-    basic['callback'].append()
+#    basic['callback'].append()
 # sd = Sdforlstm(path="stackrnn/sdata/", task='dyck1@phlstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
 # sd = Sdforlstm(path="stackrnn/sdata/", task=sys.argv[1] + '@' + sys.argv[2])
-# sd = Save_loss(path='stackrnn/sdata/', task=task)
+
 elif sys.argv[3] == 'testspec':
     basic['load'] = True
     basic['onlytest'] = True
-    basic['callback'].append()
 # sd = Sdforlstm(path="stackrnn/sdata/", task='dyck1@phlstm')
 # sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
-# sd = Sdforstacksrn(path="stackrnn/sdata/", task='dyck2@srn')
+#     sd = Sdforstacksrn(path="stackrnn/sdata/", task=sys.argv[1] + '@' + sys.argv[2])
 # sd = Sdforlstm(path="stackrnn/sdata/", task=sys.argv[1] + '@' + sys.argv[2])
 # sd = Save_loss(path='stackrnn/sdata/', task=task)
+
 elif sys.argv[3] == 'loadspec':
     basic['load'] = True
 
-
+if sd:
+    basic['callback'].append(sd)
 rnn = {
    "task_class": RNNTask,
     "model_class": RNN,
@@ -98,10 +102,10 @@ stackrnn = {
     "n_args": 2,
     'hidden_size': 2,
     "lr": 1e-3,
-    "alpha": 0.01,
+    "alpha": 0.001,
     'addstackloss': True,
     'customization': False,
-    'addubias': True,
+    'addubias': False,
     'ubias': -1,
     'weight_decay': 0,
 }
@@ -116,6 +120,12 @@ stackgru = {
     'controller_cell_class': nn.GRUCell,
     }
 
+stacklstm = {
+    "model_name": "stacklstm",
+    'controller_cell_class': nn.LSTMCell,
+    }
+
+
 stackphlstm = {
     "model_name": "stackphlstm",
     'controller_cell_class': PHLSTMCell,
@@ -123,6 +133,7 @@ stackphlstm = {
 
 append(stacksrn, stackrnn)
 append(stackgru, stackrnn)
+append(stacklstm, stackrnn)
 append(stackphlstm, stackrnn)
 
 tomita = {
@@ -438,10 +449,63 @@ append(dyck1gruConfig, basic, dyck1, gru)
 append(dyck1lstmConfig, basic, dyck1, lstm)
 append(dyck1phlstmConfig, basic, dyck1, phlstm)
 
+anbnstacksrnConfig = {
+    "task_name": "anbn@stacksrn",     
+    "load_model": r'finaltrain_anbnstacksrn',
+    'lr':5 * 1e-4,
+            }
+
+anbncnstacksrnConfig = {
+    "task_name": "anbncn@stacksrn",     
+    "load_model": r'anbncn@stacksrn_1.00_1.00@honey',
+            }
+
+dyck1stacksrnConfig = {
+    "task_name": "dyck1@stacksrn",     
+    "load_model": r'dyck1@stacksrn_1.00_1.00@honey',
+            }
+
+t4stacksrnConfig = {
+    "task_name": "t4@stacksrn",     
+    "load_model": r't4@stacksrn_1.00_0.00@1455',
+            }
+
+append(anbnstacksrnConfig, basic, anbn, stacksrn)
+append(anbncnstacksrnConfig, basic, anbncn, stacksrn)
+append(dyck1stacksrnConfig, basic, dyck1, stacksrn)
+append(t4stacksrnConfig, basic, t4, stacksrn)
+
+dyck2stacksrnConfig = {
+    "task_name": "dyck2@stacksrn",     
+    "load_model": r'dyck2@stacksrn_1.00_0.00@2307',
+    'hidden_size': 2,
+    'lr': 5 * 1e-3,
+            }
+
+dyck2stackgruConfig = {
+    "task_name": "dyck2@stackgru",     
+    "load_model": r'dyck2@stackgru_0.87_0.36@1101',
+    'lr': 1e-4,
+    'hidden_size': 2,
+            }
+
+dyck2stacklstmConfig = {
+    "task_name": "dyck2@stacklstm",     
+    "load_model": r'dyck2@stacklstm_0.99_0.01@1044',
+    'hidden_size': 2
+            }
+
+dyck2stackphlstmConfig = {
+    "task_name": "dyck2@stackphlstm",     
+    "load_model": r'dyck2@stacklstm_0.99_0.01@1044',
+    'hidden_size': 2
+            }
+
 dyck2srnConfig = {
     "task_name": "dyck2@srn",
     "load_model": r"dyck2@LSTM_1.00_0.80@1118",
-    'lr': 1e-4,
+#     'lr': 1e-4,
+    'addubias': False,
     }
 
 dyck2gruConfig = {
@@ -456,60 +520,19 @@ dyck2phlstmConfig = {
     'lr': 1e-3,
     }
 
+dyck2lstmConfig = {
+    "task_name": "dyck2@lstm",
+    "load_model": r"dyck2@LSTM_1.00_0.80@1118",
+    }
+
 append(dyck2srnConfig, basic, dyck2, srn)
 append(dyck2gruConfig, basic, dyck2, gru)
 append(dyck2phlstmConfig, basic, dyck2, phlstm)
-
-
-anbnstackgruConfig = {
-    "task_name": "anbn@stackgru",     
-    "load_model": r'finaltrain_anbnstackgru',
-    'lr':5 * 1e-4,
-            }
-
-anbncnstackgruConfig = {
-    "task_name": "anbncn@stackgru",     
-    "load_model": r'anbncn@stackgru_1.00_1.00@honey',
-            }
-
-dyck1stackgruConfig = {
-    "task_name": "dyck1@stackgru",     
-    "load_model": r'dyck1@stackgru_1.00_1.00@honey',
-            }
-
-t4stackgruConfig = {
-    "task_name": "t4@stackgru",     
-    "load_model": r't4@stackgru_1.00_1.00@honey',
-            }
-append(anbnstackgruConfig, basic, anbn, stackgru)
-append(anbncnstackgruConfig, basic, anbncn, stackgru)
-append(dyck1stackgruConfig, basic, dyck1, stackgru)
-append(t4stackgruConfig, basic, t4, stackgru)
-
-dyck2stacksrnConfig = {
-    "task_name": "dyck2@stacksrn",     
-    "load_model": r'dyck2@stacksrn_1.00_0.00@1147',
-    'hidden_size': 2,
-    'lr': 5 * 1e-3,
-            }
-
-dyck2stackgruConfig = {
-    "task_name": "dyck2@stackgru",     
-    "load_model": r'dyck2@stackgru_1.00_0.00@1218',
-    'lr': 1e-4,
-    'hidden_size': 2,
-            }
-
-dyck2stackphlstmConfig = {
-    "task_name": "dyck2@stackphlstm",     
-    "load_model": r'dyck2@stackphlstm_1.00_0.01@2216',
-    'hidden_size': 2
-            }
-
+append(dyck2lstmConfig, basic, dyck2, lstm)
 append(dyck2stacksrnConfig, basic, dyck2, stacksrn)
 append(dyck2stackgruConfig, basic, dyck2, stackgru)
 append(dyck2stackphlstmConfig, basic, dyck2, stackphlstm)
-
+append(dyck2stacklstmConfig, basic, dyck2, stacklstm)
 if __name__ == "__main__":
             config_dict = eval( task + 'Config')
             task = config_dict["task_class"](config_dict)

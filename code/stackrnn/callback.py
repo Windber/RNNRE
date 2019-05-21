@@ -22,7 +22,7 @@ class Save_loss(Call_back):
         self.params = kwargs
         self.eepoch = list()
     def eepoch_cb(self, model, *args):
-        f = open(self.path + self.task + '_loss', 'wb')
+        f = open(self.path + self.task + '_loss', self.mode)
         pickle.dump(self.eepoch, f)
         f.close()
     def epoch_cb(self, model, *args):
