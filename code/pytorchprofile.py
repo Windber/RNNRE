@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
-from stackrnn.stackrnntask import StackRNNTask, StackRNN
+from stackrnn.stackrnntask import StackRNNTask, StackRNN, MultiStackRNN, MultiStackRNNTask
 from stackrnn.rnntask import RNNTask, RNN, PHLSTMCell, MyLSTMCell
 from stackrnn.nlfunction import *
-from stackrnn.stackrnncell import StackRNNCell
+from stackrnn.stackrnncell import StackRNNCell, MultiStackRNNCell
 from stackrnn.callback import Save_data, Sdforlstm, Save_loss, Sdforstacksrn
 
 def append(ori, *dess):
@@ -17,8 +17,8 @@ import sys
 task = sys.argv[1] + sys.argv[2] 
 basic = {
     "batch_size": 100,
-    "epochs": 30,
-    "testfile_num": 5,
+    "epochs": 10,
+    "testfile_num": 3,
     "lr": 1e-3,
     "device": torch.device("cpu"),
     "verbose": False,
@@ -99,16 +99,28 @@ stackrnn = {
     "model_class": StackRNN,
     'cell_class': StackRNNCell,
     "read_size": 2,
-    "n_args": 2,
     'hidden_size': 2,
     "lr": 1e-3,
     "alpha": 0.001,
     'addstackloss': True,
     'customization': False,
-    'addubias': False,
+    'addubias': True,
     'ubias': -1,
     'weight_decay': 0,
 }
+
+multistackrnn = {
+    "task_class": MultiStackRNNTask,
+    "model_class": MultiStackRNN,
+    'cell_class': MultiStackRNNCell,
+    'stack_num': 2,
+    
+    }
+
+multistacksrn = {
+    "model_name": "multistacksrn",
+    'controller_cell_class': nn.RNNCell,
+    }
 
 stacksrn = {
     "model_name": "stacksrn",
@@ -135,7 +147,8 @@ append(stacksrn, stackrnn)
 append(stackgru, stackrnn)
 append(stacklstm, stackrnn)
 append(stackphlstm, stackrnn)
-
+append(multistackrnn, stackrnn)
+append(multistacksrn, multistackrnn)
 tomita = {
     "input_size": 4,
     "hidden_size": 2,
@@ -533,6 +546,14 @@ append(dyck2stacksrnConfig, basic, dyck2, stacksrn)
 append(dyck2stackgruConfig, basic, dyck2, stackgru)
 append(dyck2stackphlstmConfig, basic, dyck2, stackphlstm)
 append(dyck2stacklstmConfig, basic, dyck2, stacklstm)
+
+anbncnmultistacksrnConfig = {
+    "task_name": "anbncn@multistacksrn",     
+    "load_model": r'anbncn@stacksrn_1.00_1.00@honey',
+    'lr': 5 * 1e-3,
+            }
+append(anbncnmultistacksrnConfig, basic, anbncn, multistacksrn)
+
 if __name__ == "__main__":
             config_dict = eval( task + 'Config')
             task = config_dict["task_class"](config_dict)
