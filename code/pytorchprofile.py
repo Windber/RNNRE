@@ -17,7 +17,7 @@ import sys
 task = sys.argv[1] + sys.argv[2] 
 basic = {
     "batch_size": 100,
-    "epochs": 10,
+    "epochs": 50,
     "testfile_num": 3,
     "lr": 1e-3,
     "device": torch.device("cpu"),
