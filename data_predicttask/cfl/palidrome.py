@@ -58,9 +58,9 @@ import sys
 if __name__ == "__main__":
     propab = list(map(lambda x: max(0.01, min(0.99, x)), [random.random() for i in range(10)]))
     second = True
-    iter = 2000 if len(sys.argv) == 1 else int(sys.argv[1])
+    iter = 10000 if len(sys.argv) == 1 else int(sys.argv[1])
 
-    expectdepth = [256, 512]
+    expectdepth = [32, 64]
     d2 = Palidrome(V=None,
                 T=None,
                 S=None,
