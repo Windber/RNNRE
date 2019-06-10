@@ -60,7 +60,7 @@ if __name__ == "__main__":
     second = True
     iter = 10000 if len(sys.argv) == 1 else int(sys.argv[1])
 
-    expectdepth = [256, 512]
+    expectdepth = [32, 64]
     d2 = Palidrome(V=None,
                 T=None,
                 S=None,
