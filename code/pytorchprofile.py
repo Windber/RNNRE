@@ -226,6 +226,17 @@ dyck2 = {
 }
 append(dyck2, cfl)
 
+palindrome = {
+    "input_size": 7,
+    'hidden_size': 2,
+    "output_size": 6,
+    "alphabet": {"s": [0], "e": [1], 'z': [2], 'a': [3], 'b': [4], 'c': [5], 'd': [6]},
+    "classes": {"1": [1, 0, 0, 0, 0, 0], "3d": [1, 0, 1, 1, 1, 1], "3e": [0, 1, 1, 1, 1, 1]
+                , '4': [0, 0, 1, 0, 0, 0], '8': [0, 0, 0, 1, 0, 0], '10': [0, 0, 0, 0, 1, 0], '20': [0, 0, 0, 0, 0, 1]},
+    'data_name': 'palindrome'
+}
+append(palindrome, cfl)
+
 t1srnConfig = {
     "task_name": "t1@srn",
     "load_model": r"t1@srn_0.03_0.01@1322",
@@ -525,11 +536,18 @@ dyck2lstmConfig = {
     "load_model": r"dyck2@LSTM_1.00_0.80@1118",
     }
 
+palindromestacksrnConfig = {
+    "task_name": "palindrome@stacksrn",     
+    "load_model": r'dyck2@stacksrn_1.00_0.00@0409',
+    'hidden_size': 2,
+    'lr': 5 * 1e-3,
+            }
 append(dyck2srnConfig, basic, dyck2, srn)
 append(dyck2gruConfig, basic, dyck2, gru)
 append(dyck2phlstmConfig, basic, dyck2, phlstm)
 append(dyck2lstmConfig, basic, dyck2, lstm)
 append(dyck2stacksrnConfig, basic, dyck2, stacksrn)
+append(palindromestacksrnConfig, basic, palindrome, stacksrn)
 append(dyck2stackgruConfig, basic, dyck2, stackgru)
 append(dyck2stackphlstmConfig, basic, dyck2, stackphlstm)
 append(dyck2stacklstmConfig, basic, dyck2, stacklstm)
